@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "api-gateway" {
-  source = "./../../"
+  source = "./../"
 
   name        = "api-gateway"
   application = "clouddrove"
@@ -18,7 +18,7 @@ module "api-gateway" {
 
   integration_types        = ["MOCK", "AWS_PROXY"]
   integration_http_methods = ["POST", "POST"]
-  uri                      = ["", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxxx:function:name/invocations"]
+  uri                      = ["", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:866067750630:function:test/invocations"]
   integration_request_parameters = [{
     "integration.request.header.X-Authorization" = "'static'"
   }, {}]
@@ -56,8 +56,8 @@ EOF
 
   authorizer_count                = 2
   authorizer_names                = ["test", "test1"]
-  authorizer_uri                  = ["arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxxx:function:name/invocations", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxxx:function:name/invocations"]
-  authorizer_credentials          = ["arn:aws:iam::xxxxxxxxxxx:role/lambda-role", "arn:aws:iam::xxxxxxxxxxx:role/lambda-role"]
+  authorizer_uri                  = ["arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:866067750630:function:test/invocations", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:866067750630:function:test/invocations"]
+  authorizer_credentials          = ["arn:aws:iam::866067750630:role/lambda-role", "arn:aws:iam::866067750630:role/lambda-role"]
   identity_sources                = ["method.request.header.Authorization", "method.request.header.Authorization"]
   identity_validation_expressions = ["sfdgfhghrfdsdas", ""]
   authorizer_types                = ["TOKEN", "REQUEST"]
