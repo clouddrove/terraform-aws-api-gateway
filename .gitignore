@@ -1,0 +1,6 @@
+# ignored files
+*.tfstate
+*.tfstate.backup
+.terraform
+.idea
+*.iml
