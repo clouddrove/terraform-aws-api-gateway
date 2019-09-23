@@ -1,5 +1,5 @@
-# Module      : Route53
-# Description : Terraform module to create Route53 resource on AWS for managing queue.
+# Module      : Api Gateway
+# Description : Terraform module to create Api Gateway resource on AWS.
 output "id" {
   value = concat(
     aws_api_gateway_rest_api.default.*.id,
