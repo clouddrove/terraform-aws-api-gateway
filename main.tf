@@ -120,6 +120,66 @@ resource "aws_api_gateway_integration_response" "default" {
   content_handling = length(var.response_content_handlings) > 0 ? element(var.response_content_handlings, count.index) : null
 }
 
+resource "aws_api_gateway_method" "options_method" {
+  count = length(var.path_parts) > 0 ? length(var.path_parts) : 0
+  rest_api_id = aws_api_gateway_rest_api.default.*.id[0]
+  resource_id = aws_api_gateway_resource.default.*.id[count.index]
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_200" {
+  count = length(aws_api_gateway_method.default.*.id)
+  rest_api_id = aws_api_gateway_rest_api.default.*.id[0]
+  resource_id = aws_api_gateway_resource.default.*.id[count.index]
+  http_method = aws_api_gateway_method.options_method.*.http_method[count.index]
+  status_code = "200"
+
+  response_models {
+    "application/json" = "Empty"
+  }
+
+  response_parameters {
+    "method.response.header.Access-Control-Allow-Origin"      = true
+    "method.response.header.Access-Control-Allow-Headers"     = true
+    "method.response.header.Access-Control-Allow-Methods"     = true
+    "method.response.header.Access-Control-Allow-Credentials" = true
+  }
+
+  depends_on = ["aws_api_gateway_method.options_method"]
+}
+
+resource "aws_api_gateway_integration" "options_integration" {
+  count = length(aws_api_gateway_method.default.*.id)
+  rest_api_id = aws_api_gateway_rest_api.default.*.id[0]
+  resource_id = aws_api_gateway_resource.default.*.id[count.index]
+  http_method = aws_api_gateway_method.options_method.*.http_method[count.index]
+
+  type             = "MOCK"
+  content_handling = "CONVERT_TO_TEXT"
+
+  depends_on = ["aws_api_gateway_method.options_method"]
+}
+
+resource "aws_api_gateway_integration_response" "options_integration_response" {
+  count = length(aws_api_gateway_integration.options_integration.*.id)
+  rest_api_id = aws_api_gateway_rest_api.default.*.id[0]
+  resource_id = aws_api_gateway_resource.default.*.id[count.index]
+  http_method = aws_api_gateway_method.options_method.*.http_method[count.index]
+  status_code = aws_api_gateway_method_response.options_200.*.status_code[count.index]
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+  }
+
+  depends_on = [
+    "aws_api_gateway_method_response.options_200",
+    "aws_api_gateway_integration.options_integration",
+  ]
+}
+
 # Module      : Api Gateway Deployment
 # Description : Terraform module to create Api Gateway Deployment resource on AWS.
 resource "aws_api_gateway_deployment" "default" {
