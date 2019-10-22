@@ -34,8 +34,8 @@ EOF
   }, {}]
 
   # Api Gateway Method Response
-  status_codes = [200, 200]
-  response_models = [{ "application/json" = "Empty" }, {}]
+  status_codes        = [200, 200]
+  response_models     = [{ "application/json" = "Empty" }, {}]
   response_parameters = [{ "method.response.header.X-Some-Header" = true }, {}]
 
   # Api Gateway Integration Response
@@ -50,19 +50,19 @@ EOF
 EOF
   }, {}]
 
-# Api Gateway Deployment
+  # Api Gateway Deployment
   deployment_enabled = true
   stage_name         = "deploy"
 
-# Api Gateway Stage
+  # Api Gateway Stage
   stage_enabled = true
   stage_names   = ["qa", "dev"]
 
-# Api Gateway Client Certificate
+  # Api Gateway Client Certificate
   cert_enabled     = true
   cert_description = "clouddrove"
 
-# Api Gateway Authorizer
+  # Api Gateway Authorizer
   authorizer_count                = 2
   authorizer_names                = ["test", "test1"]
   authorizer_uri                  = ["arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations"]
@@ -71,17 +71,17 @@ EOF
   identity_validation_expressions = ["sfdgfhghrfdsdas", ""]
   authorizer_types                = ["TOKEN", "REQUEST"]
 
-# Api Gateway Gateway Response
+  # Api Gateway Gateway Response
   gateway_response_count = 2
   response_types         = ["UNAUTHORIZED", "RESOURCE_NOT_FOUND"]
   gateway_status_codes   = ["401", "404"]
 
-# Api Gateway Model
+  # Api Gateway Model
   model_count   = 2
   model_names   = ["test", "test1"]
   content_types = ["application/json", "application/json"]
 
-# Api Gateway Api Key
+  # Api Gateway Api Key
   key_count = 2
   key_names = ["test", "test1"]
 }

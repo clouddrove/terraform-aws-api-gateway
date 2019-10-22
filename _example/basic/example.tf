@@ -33,8 +33,8 @@ EOF
   }, {}]
 
   # Api Gateway Method Response
-  status_codes = [200, 200]
-  response_models = [{ "application/json" = "Empty" }, {}]
+  status_codes        = [200, 200]
+  response_models     = [{ "application/json" = "Empty" }, {}]
   response_parameters = [{ "method.response.header.X-Some-Header" = true }, {}]
 
   # Api Gateway Integration Response
@@ -49,11 +49,11 @@ EOF
 EOF
   }, {}]
 
-# Api Gateway Deployment
+  # Api Gateway Deployment
   deployment_enabled = true
   stage_name         = "deploy"
 
-# Api Gateway Stage
+  # Api Gateway Stage
   stage_enabled = true
   stage_names   = ["qa", "dev"]
 }
