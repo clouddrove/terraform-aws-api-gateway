@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "api-gateway" {
-  source = "git::https://github.com/clouddrove/terraform-aws-api-gateway.git?ref=tags/0.12.0"
+  source = "../../"
 
   name        = "api-gateway"
   application = "clouddrove"

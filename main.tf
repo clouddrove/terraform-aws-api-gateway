@@ -11,6 +11,7 @@ module "labels" {
   name        = var.name
   application = var.application
   environment = var.environment
+  managedby   = var.managedby
   label_order = var.label_order
 }
 
@@ -144,7 +145,7 @@ resource "aws_api_gateway_method_response" "options_200" {
     "method.response.header.Access-Control-Allow-Credentials" = true
   }
 
-  depends_on = ["aws_api_gateway_method.options_method"]
+  depends_on = [aws_api_gateway_method.options_method]
 }
 
 resource "aws_api_gateway_integration" "options_integration" {
@@ -156,7 +157,7 @@ resource "aws_api_gateway_integration" "options_integration" {
   type             = "MOCK"
   content_handling = "CONVERT_TO_TEXT"
 
-  depends_on = ["aws_api_gateway_method.options_method"]
+  depends_on = [aws_api_gateway_method.options_method]
 }
 
 resource "aws_api_gateway_integration_response" "options_integration_response" {
@@ -173,8 +174,8 @@ resource "aws_api_gateway_integration_response" "options_integration_response" {
   }
 
   depends_on = [
-    "aws_api_gateway_method_response.options_200",
-    "aws_api_gateway_integration.options_integration",
+    aws_api_gateway_method_response.options_200,
+    aws_api_gateway_integration.options_integration,
   ]
 }
 
