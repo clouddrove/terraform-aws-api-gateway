@@ -1,0 +1,50 @@
+name: 'Create README.md file'
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  readme-create:
+    name: 'readme-create'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@master
+
+      - name: Set up Python 3.7.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: 'Install test dependencies.'
+        run: pip install yamllint
+
+      - name: Run yamllint.
+        run: yamllint ./README.yaml
+
+      - name: clone Genie repo
+        run: |
+          export GITHUB_ACCESS_TOKEN=${{ secrets.GITHUB }}
+          cd .. && cd .. && cd ..
+          git clone https://${{ secrets.GITHUB }}@github.com/clouddrove/genie.git
+          cd /home/runner/work/terraform-aws-security-group/terraform-aws-security-group
+          make packages/install/gomplate
+          make readme
+      - name: push to repo back
+        run: |
+          git config --global user.email "anmol@clouddrove.com"
+          git config --global user.name "Anmol nagpal"
+          git add . && git commit -m "upload"
+          git push origin master
+
+      - name: 'Slack Notification'
+        uses: clouddrove/action-slack@v2
+        with:
+          status: ${{ job.status }}
+          fields: repo,author
+          author_name: 'Clouddrove'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TERRAFORM }} # required
+        if: always()
