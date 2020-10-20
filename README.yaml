@@ -39,7 +39,8 @@ usage: |-
   ### Basic Example
   ```hcl
     module "api-gateway" {
-      source                          = "git::https://github.com/clouddrove/terraform-aws-api-gateway.git?ref=tags/0.13.0"
+      source        = "clouddrove/api-gateway/aws"
+      version       = "0.13.0"
       name        = "api-gateway"
       application = "clouddrove"
       environment = "test"
@@ -97,7 +98,8 @@ usage: |-
   ### Complete Example
   ```hcl
     module "api-gateway" {
-      source                          = "git::https://github.com/clouddrove/terraform-aws-api-gateway.git?ref=tags/0.13.0"
+      source        = "clouddrove/api-gateway/aws"
+      version       = "0.13.0"
       name        = "api-gateway"
       application = "clouddrove"
       environment = "test"
