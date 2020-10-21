@@ -6,7 +6,7 @@
 #              for resources. You can use terraform-labels to implement a strict naming
 #              convention.
 module "labels" {
-  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.12.0"
+  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.13.0"
 
   name        = var.name
   application = var.application
@@ -16,7 +16,7 @@ module "labels" {
 }
 
 # Module      : Api Gateway
-# Description : Terraform module to create Api Gateway resource on AWS for creating api.
+# Description : Terraform module to create Api Gateway resource on AWS for creatng api.
 resource "aws_api_gateway_rest_api" "default" {
   count = var.enabled ? 1 : 0
 
