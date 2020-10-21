@@ -1,0 +1,54 @@
+name: 'Create README.md file'
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  readme-create:
+    name: 'readme-create'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@master
+
+      - name: Set up Python 3.7.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: 'create readme'
+        uses: 'clouddrove/github-actions@v4.0'
+        with:
+          actions_subcommand: 'readme'
+          github_token: '${{ secrets.GITHUB}}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+
+
+      - name: pre-commit check errors
+        uses: pre-commit/action@v2.0.0
+        continue-on-error: true
+
+      - name: pre-commit fix erros
+        uses: pre-commit/action@v2.0.0
+        continue-on-error: true
+
+      - name: 'push readme'
+        uses: 'clouddrove/github-actions@v4.0'
+        continue-on-error: true
+        with:
+          actions_subcommand: 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+
+      - name: 'Slack Notification'
+        uses: clouddrove/action-slack@v2
+        with:
+          status: ${{ job.status }}
+          fields: repo,author
+          author_name: 'CloudDrove'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TERRAFORM }} # required
+        if: always()
