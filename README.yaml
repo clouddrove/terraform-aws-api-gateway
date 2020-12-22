@@ -101,7 +101,7 @@ usage: |-
     module "api-gateway" {
       source        = "clouddrove/api-gateway/aws"
       version       = "0.13.0"
-      
+
       name        = "api-gateway"
       repository  = "https://registry.terraform.io/modules/clouddrove/api-gateway/aws/0.14.0"
       environment = "test"
