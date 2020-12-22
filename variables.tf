@@ -6,12 +6,17 @@ variable "name" {
   description = "Name  (e.g. `app` or `cluster`)."
 }
 
-variable "application" {
+variable "repository" {
   type        = string
   default     = ""
-  description = "Application (e.g. `cd` or `clouddrove`)."
-}
+  description = "Terraform current module repo"
 
+  validation {
+    # regex(...) fails if it cannot find a match
+    condition     = can(regex("^https://", var.repository))
+    error_message = "The module-repo value must be a valid Git repo link."
+  }
+}
 variable "environment" {
   type        = string
   default     = ""
@@ -44,8 +49,8 @@ variable "tags" {
 
 variable "managedby" {
   type        = string
-  default     = "anmol@clouddrove.com"
-  description = "ManagedBy, eg 'CloudDrove' or 'AnmolNagpal'."
+  default     = "hello@clouddrove.com"
+  description = "ManagedBy, eg 'CloudDrove'."
 }
 
 # Module      : Api Gateway
@@ -162,12 +167,14 @@ variable "authorization_scopes" {
   type        = list
   default     = []
   description = "The authorization scopes used when the authorization is COGNITO_USER_POOLS."
+  sensitive   = true
 }
 
 variable "api_key_requireds" {
   type        = list
   default     = []
   description = "Specify if the method requires an API key."
+  sensitive   = true
 }
 
 variable "request_models" {
@@ -180,6 +187,7 @@ variable "request_validator_ids" {
   type        = list
   default     = []
   description = "The ID of a aws_api_gateway_request_validator."
+  sensitive   = true
 }
 
 variable "request_parameters" {
@@ -204,24 +212,28 @@ variable "connection_types" {
   type        = list
   default     = []
   description = "The integration input's connectionType. Valid values are INTERNET (default for connections through the public routable internet), and VPC_LINK (for private connections between API Gateway and a network load balancer in a VPC)."
+  sensitive   = true
 }
 
 variable "connection_ids" {
   type        = list
   default     = []
   description = "The id of the VpcLink used for the integration. Required if connection_type is VPC_LINK."
+  sensitive   = true
 }
 
 variable "uri" {
   type        = list
   default     = []
   description = "The input's URI. Required if type is AWS, AWS_PROXY, HTTP or HTTP_PROXY. For HTTP integrations, the URI must be a fully formed, encoded HTTP(S) URL according to the RFC-3986 specification . For AWS integrations, the URI should be of the form arn:aws:apigateway:{region}:{subdomain.service|service}:{path|action}/{service_api}. region, subdomain and service are used to determine the right endpoint. e.g. arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:012345678901:function:my-func/invocations."
+  sensitive   = true
 }
 
 variable "credentials" {
   type        = list
   default     = []
   description = "The credentials required for the integration. For AWS integrations, 2 options are available. To specify an IAM Role for Amazon API Gateway to assume, use the role's ARN. To require that the caller's identity be passed through from the request, specify the string arn:aws:iam::*:user/*."
+  sensitive   = true
 }
 
 variable "integration_request_parameters" {
@@ -234,6 +246,7 @@ variable "request_templates" {
   type        = list
   default     = []
   description = "A map of the integration's request templates."
+  sensitive   = true
 }
 
 variable "passthrough_behaviors" {
@@ -246,12 +259,14 @@ variable "cache_key_parameters" {
   type        = list
   default     = []
   description = "A list of cache key parameters for the integration."
+  sensitive   = true
 }
 
 variable "cache_namespaces" {
   type        = list
   default     = []
   description = "The integration's cache namespace."
+  sensitive   = true
 }
 
 variable "content_handlings" {
@@ -324,6 +339,7 @@ variable "client_certificate_ids" {
   type        = list
   default     = []
   description = "The identifier of a client certificate for the stage"
+  sensitive   = true
 }
 
 variable "descriptions" {
@@ -354,6 +370,7 @@ variable "destination_arns" {
   type        = list
   default     = []
   description = "ARN of the log group to send the logs to. Automatically removes trailing :* if present."
+  sensitive   = true
 }
 
 variable "formats" {
@@ -384,12 +401,14 @@ variable "authorizer_uri" {
   type        = list
   default     = []
   description = "The authorizer's Uniform Resource Identifier (URI). This must be a well-formed Lambda function URI in the form of arn:aws:apigateway:{region}:lambda:path/{service_api}, e.g. arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-west-2:012345678912:function:my-function/invocations."
+  sensitive   = true
 }
 
 variable "authorizer_credentials" {
   type        = list
   default     = []
   description = "The credentials required for the authorizer. To specify an IAM Role for API Gateway to assume, use the IAM Role ARN."
+  sensitive   = true
 }
 
 variable "authorizer_result_ttl_in_seconds" {
@@ -420,6 +439,7 @@ variable "provider_arns" {
   type        = list
   default     = []
   description = "required for type COGNITO_USER_POOLS) A list of the Amazon Cognito user pool ARNs. Each element is of this format: arn:aws:cognito-idp:{region}:{account_id}:userpool/{user_pool_id}."
+  sensitive   = true
 }
 
 variable "authorizer_count" {
@@ -510,6 +530,7 @@ variable "target_arns" {
   type        = list
   default     = []
   description = "The list of network load balancer arns in the VPC targeted by the VPC link. Currently AWS only supports 1 target."
+  sensitive   = true
 }
 
 variable "key_count" {
@@ -540,4 +561,5 @@ variable "values" {
   type        = list
   default     = []
   description = "The value of the API key. If not specified, it will be automatically generated by AWS on creation."
+  sensitive   = true
 }
