@@ -1,5 +1,5 @@
 # Module      : Api Gateway
-# Description : Terraform module to create Api Gateway resource on AWS.
+# Description : Terraform Api Gateway module outputs.
 output "id" {
   value       = join("", aws_api_gateway_rest_api.default.*.id)
   description = "The ID of the REST API."

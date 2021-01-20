@@ -10,16 +10,11 @@ variable "repository" {
   type        = string
   default     = ""
   description = "Terraform current module repo"
-
-  validation {
-    # regex(...) fails if it cannot find a match
-    condition     = can(regex("^https://", var.repository))
-    error_message = "The module-repo value must be a valid Git repo link."
-  }
 }
+
 variable "environment" {
   type        = string
-  default     = ""
+  default     = "https://registry.terraform.io/modules/clouddrove/api-gateway/aws"
   description = "Environment (e.g. `prod`, `dev`, `staging`)."
 }
 
@@ -33,12 +28,6 @@ variable "attributes" {
   type        = list
   default     = []
   description = "Additional attributes (e.g. `1`)."
-}
-
-variable "delimiter" {
-  type        = string
-  default     = "-"
-  description = "Delimiter to be used between `organization`, `environment`, `name` and `attributes`."
 }
 
 variable "tags" {
