@@ -41,11 +41,10 @@ usage: |-
     module "api-gateway" {
       source        = "clouddrove/api-gateway/aws"
       version       = "0.14.0"
-
-      name        = "api-gateway"
-      environment = "test"
-      label_order = ["name", "environment"]
-      enabled     = true
+      name          = "api-gateway"
+      environment   = "test"
+      label_order   = ["name", "environment"]
+      enabled       = true
 
     # Api Gateway Resource
       path_parts = ["mytestresource", "mytestresource1"]
