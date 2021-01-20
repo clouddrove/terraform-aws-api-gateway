@@ -6,9 +6,8 @@ module "api-gateway" {
   source = "../../"
 
   name        = "api-gateway"
-  application = "clouddrove"
   environment = "test"
-  label_order = ["environment", "name", "application"]
+  label_order = ["name", "environment"]
   enabled     = true
 
   # Api Gateway Resource

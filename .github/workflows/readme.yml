@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@master
+        uses: actions/checkout@v2.3.4
 
       - name: Set up Python 3.7.
         uses: actions/setup-python@v2
@@ -18,13 +18,12 @@ jobs:
           python-version: '3.x'
 
       - name: 'create readme'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'readme'
           github_token: '${{ secrets.GITHUB}}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
-
 
       - name: pre-commit check errors
         uses: pre-commit/action@v2.0.0
@@ -35,7 +34,7 @@ jobs:
         continue-on-error: true
 
       - name: 'push readme'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         continue-on-error: true
         with:
           actions_subcommand: 'push'
