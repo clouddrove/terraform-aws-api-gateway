@@ -6,13 +6,13 @@ on:
     types: [labeled]
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  Terratest:
+    name: 'Terratest for basic'
     runs-on: ubuntu-latest
     steps:
 
       - name: 'Checkout'
-        uses: actions/checkout@master
+        uses: actions/checkout@v2.3.4
 
       - name: Configure AWS Credentials
         uses: clouddrove/configure-aws-credentials@v1
@@ -23,7 +23,7 @@ jobs:
 
       - name: 'Terratest'
         if: ${{ github.event.label.name == 'terratest' }}
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'terratest'
           tf_actions_working_dir: '_test/basic'
