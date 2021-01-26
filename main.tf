@@ -51,9 +51,7 @@ resource "aws_api_gateway_model" "default" {
   description  = length(var.model_descriptions) > 0 ? element(var.model_descriptions, count.index) : ""
   content_type = element(var.content_types, count.index)
 
-  schema = <<EOF
-{"type":"object"}
-EOF
+  schema = length(var.schemas) > 0 ? element(var.schemas, count.index) : ""
 }
 
 # Module      : Api Gateway Method
