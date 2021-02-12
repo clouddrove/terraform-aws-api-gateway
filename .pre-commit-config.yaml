@@ -1,13 +1,20 @@
 repos:
-  - repo: git://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.43.0
-    hooks:
-    - id: terraform_fmt
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.12 # Get the latest from: https://github.com/gruntwork-io/pre-commit/releases
     hooks:
+      - id: terraform-fmt
+      - id: shellcheck
+
+  - repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0 # Use the ref you want to point at
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: check-byte-order-marker
+      - id: check-executables-have-shebangs
       - id: check-merge-conflict
+      - id: debug-statements
       - id: check-yaml
       - id: check-added-large-files
-      - id: trailing-whitespace

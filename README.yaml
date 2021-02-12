@@ -16,7 +16,7 @@ github_repo: clouddrove/terraform-aws-api-gateway
 # Badges to display
 badges:
   - name: "Terraform"
-    image: "https://img.shields.io/badge/Terraform-v0.13-green"
+    image: "https://img.shields.io/badge/Terraform-v0.14-green"
     url: "https://www.terraform.io"
   - name: "Licence"
     image: "https://img.shields.io/badge/License-MIT-blue.svg"
@@ -40,12 +40,11 @@ usage: |-
   ```hcl
     module "api-gateway" {
       source        = "clouddrove/api-gateway/aws"
-      version       = "0.13.0"
-      name        = "api-gateway"
-      application = "clouddrove"
-      environment = "test"
-      label_order = ["environment", "name", "application"]
-      enabled     = true
+      version       = "0.14.0"
+      name          = "api-gateway"
+      environment   = "test"
+      label_order   = ["name", "environment"]
+      enabled       = true
 
     # Api Gateway Resource
       path_parts = ["mytestresource", "mytestresource1"]
@@ -99,11 +98,11 @@ usage: |-
   ```hcl
     module "api-gateway" {
       source        = "clouddrove/api-gateway/aws"
-      version       = "0.13.0"
+      version       = "0.14.0"
+
       name        = "api-gateway"
-      application = "clouddrove"
       environment = "test"
-      label_order = ["environment", "name", "application"]
+      label_order = ["name", "environment"]
       enabled     = true
 
     # Api Gateway Resource

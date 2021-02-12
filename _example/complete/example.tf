@@ -8,7 +8,7 @@ module "api-gateway" {
   name        = "api-gateway"
   repository  = "https://registry.terraform.io/modules/clouddrove/api-gateway/aws/0.14.0"
   environment = "test"
-  label_order = ["environment", "name", "application"]
+  label_order = ["name", "environment"]
   enabled     = true
 
   # Api Gateway Resource
@@ -65,8 +65,8 @@ EOF
   # Api Gateway Authorizer
   authorizer_count                = 2
   authorizer_names                = ["test", "test1"]
-  authorizer_uri                  = ["arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations"]
-  authorizer_credentials          = ["arn:aws:iam::xxxxxxxxxx:role/lambda-role", "arn:aws:iam::xxxxxxxxxx:role/lambda-role"]
+  authorizer_uri                  = ["arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:924144197303:function:test/invocations", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations"]
+  authorizer_credentials          = ["arn:aws:iam::924144197303:role/lambda-role", "arn:aws:iam::924144197303:role/lambda-role"]
   identity_sources                = ["method.request.header.Authorization", "method.request.header.Authorization"]
   identity_validation_expressions = ["sfdgfhghrfdsdas", ""]
   authorizer_types                = ["TOKEN", "REQUEST"]
