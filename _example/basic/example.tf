@@ -5,7 +5,7 @@ provider "aws" {
 module "api-gateway" {
   source      = "../../"
   name        = "api-gateway"
-  application = "clouddrove"
+  repository  = "https://registry.terraform.io/modules/clouddrove/api-gateway/aws/0.14.0"
   environment = "test"
   label_order = ["environment", "name", "application"]
   enabled     = true

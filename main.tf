@@ -6,13 +6,15 @@
 #              for resources. You can use terraform-labels to implement a strict naming
 #              convention.
 module "labels" {
-  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.13.0"
+  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.14.0"
 
+  enabled     = var.enabled
   name        = var.name
-  application = var.application
+  repository  = var.repository
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
+  attributes  = var.attributes
 }
 
 # Module      : Api Gateway
@@ -29,6 +31,12 @@ resource "aws_api_gateway_rest_api" "default" {
   endpoint_configuration {
     types = var.types
   }
+}
+
+resource "aws_api_gateway_rest_api_policy" "test" {
+  rest_api_id = aws_api_gateway_rest_api.default.*.id[0]
+
+  policy = var.api_policy
 }
 
 # Module      : Api Gateway Resource
@@ -50,7 +58,7 @@ resource "aws_api_gateway_model" "default" {
   description  = length(var.model_descriptions) > 0 ? element(var.model_descriptions, count.index) : ""
   content_type = element(var.content_types, count.index)
 
-  schema = <<EOF
+  schema = length(model_schemas) > 0 ? element(var.model_schemas, count.index) : <<EOF
 {"type":"object"}
 EOF
 }
@@ -64,7 +72,7 @@ resource "aws_api_gateway_method" "default" {
   resource_id          = aws_api_gateway_resource.default.*.id[count.index]
   http_method          = element(var.http_methods, count.index)
   authorization        = length(var.authorizations) > 0 ? element(var.authorizations, count.index) : "NONE"
-  authorizer_id        = length(var.authorizer_ids) > 0 ? element(var.authorizer_ids, count.index) : null
+  authorizer_id        = length(var.authorizer_ids) > 0 ? element(var.authorizer_ids, count.index) : (length(var.authorizer_count) > 0 ? aws_api_gateway_authorizer.default.*.id[count.index] : null)
   authorization_scopes = length(var.authorization_scopes) > 0 ? element(var.authorization_scopes, count.index) : null
   api_key_required     = length(var.api_key_requireds) > 0 ? element(var.api_key_requireds, count.index) : null
   request_models       = length(var.request_models) > 0 ? element(var.request_models, count.index) : { "application/json" = "Empty" }
