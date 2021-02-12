@@ -226,6 +226,7 @@ Here are examples of how you can use this module in your inventory structure:
 | api\_key\_requireds | Specify if the method requires an API key. | `list(any)` | `[]` | no |
 | api\_key\_source | The source of the API key for requests. Valid values are HEADER (default) and AUTHORIZER. | `string` | `"HEADER"` | no |
 | api\_log\_enabled | Whether to enable log for rest api. | `bool` | `false` | no |
+| api\_policy | The policy document. | `any` | `null` | no |
 | attributes | Additional attributes (e.g. `1`). | `list(any)` | `[]` | no |
 | authorization\_scopes | The authorization scopes used when the authorization is COGNITO\_USER\_POOLS. | `list(any)` | `[]` | no |
 | authorizations | The type of authorization used for the method (NONE, CUSTOM, AWS\_IAM, COGNITO\_USER\_POOLS). | `list(any)` | `[]` | no |
@@ -280,6 +281,7 @@ Here are examples of how you can use this module in your inventory structure:
 | model\_count | Number of count to create Model for api. | `number` | `0` | no |
 | model\_descriptions | The description of the model. | `list(any)` | `[]` | no |
 | model\_names | The name of the model. | `list(any)` | `[]` | no |
+| model\_schemas | The schema of the model in a JSON form. | `list` | `[]` | no |
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
 | passthrough\_behaviors | The integration passthrough behavior (WHEN\_NO\_MATCH, WHEN\_NO\_TEMPLATES, NEVER). Required if request\_templates is used. | `list(any)` | `[]` | no |
 | path\_parts | The last path segment of this API resource. | `list(any)` | `[]` | no |
