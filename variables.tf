@@ -357,8 +357,8 @@ variable "stage_variables" {
 }
 
 variable "xray_tracing_enabled" {
-  type        = list(any)
-  default     = []
+  type        = bool
+  default     = true
   description = "A mapping of tags to assign to the resource."
 }
 

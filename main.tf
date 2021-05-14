@@ -200,6 +200,7 @@ resource "aws_api_gateway_deployment" "default" {
 resource "aws_api_gateway_client_certificate" "default" {
   count       = var.cert_enabled ? 1 : 0
   description = var.cert_description
+  tags        = module.labels.tags
 }
 
 # Module      : Api Gateway Stage
@@ -217,6 +218,7 @@ resource "aws_api_gateway_stage" "default" {
   documentation_version = length(var.documentation_versions) > 0 ? element(var.documentation_versions, count.index) : null
   variables             = length(var.stage_variables) > 0 ? element(var.stage_variables, count.index) : {}
   xray_tracing_enabled  = length(var.xray_tracing_enabled) > 0 ? element(var.xray_tracing_enabled, count.index) : false
+  tags                  = module.labels.id
 }
 
 # Module      : Api Gateway Stage
@@ -276,6 +278,7 @@ resource "aws_api_gateway_vpc_link" "default" {
   name        = element(var.vpc_link_names, count.index)
   description = length(var.vpc_link_descriptions) > 0 ? element(var.vpc_link_descriptions, count.index) : ""
   target_arns = element(var.target_arns, count.index)
+  tags        = module.labels.tags
 }
 
 # Module      : Api Gateway Api Key
@@ -286,4 +289,5 @@ resource "aws_api_gateway_api_key" "default" {
   description = length(var.key_descriptions) > 0 ? element(var.key_descriptions, count.index) : ""
   enabled     = length(var.enableds) > 0 ? element(var.enableds, count.index) : true
   value       = length(var.values) > 0 ? element(var.values, count.index) : null
+  tags        = module.labels.tags
 }
