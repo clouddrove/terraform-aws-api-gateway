@@ -54,7 +54,7 @@ EOF
   stage_name         = "deploy"
 
   # Api Gateway Stage
-  stage_enabled = true
-  stage_names   = ["qa"]
+  stage_enabled        = true
+  stage_names          = ["qa"]
   xray_tracing_enabled = false
 }
