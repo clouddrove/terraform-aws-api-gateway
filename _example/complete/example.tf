@@ -84,5 +84,5 @@ EOF
   # Api Gateway Api Key
   key_count            = 2
   key_names            = ["test", "test1"]
-  xray_tracing_enabled = false
+  xray_tracing_enabled = true
 }
