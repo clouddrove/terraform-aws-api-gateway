@@ -82,7 +82,6 @@ EOF
   content_types = ["application/json", "application/json"]
 
   # Api Gateway Api Key
-  key_count            = 2
-  key_names            = ["test", "test1"]
-  xray_tracing_enabled = true
+  key_count = 2
+  key_names = ["test", "test1"]
 }

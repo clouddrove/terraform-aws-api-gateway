@@ -217,7 +217,7 @@ resource "aws_api_gateway_stage" "default" {
   description           = length(var.descriptions) > 0 ? element(var.descriptions, count.index) : ""
   documentation_version = length(var.documentation_versions) > 0 ? element(var.documentation_versions, count.index) : null
   variables             = length(var.stage_variables) > 0 ? element(var.stage_variables, count.index) : {}
-  xray_tracing_enabled  = length(var.xray_tracing_enabled) > 0 ? element(var.xray_tracing_enabled, count.index) : false
+  xray_tracing_enabled  = true
   tags                  = module.labels.id
 }
 
@@ -236,7 +236,7 @@ resource "aws_api_gateway_stage" "with_log" {
   description           = length(var.descriptions) > 0 ? element(var.descriptions, count.index) : ""
   documentation_version = length(var.documentation_versions) > 0 ? element(var.documentation_versions, count.index) : null
   variables             = length(var.stage_variables) > 0 ? element(var.stage_variables, count.index) : {}
-  xray_tracing_enabled  = length(var.xray_tracing_enabled) > 0 ? element(var.xray_tracing_enabled, count.index) : false
+  xray_tracing_enabled  = true
   access_log_settings {
     destination_arn = element(var.destination_arns, count.index)
     format          = element(var.formats, count.index)

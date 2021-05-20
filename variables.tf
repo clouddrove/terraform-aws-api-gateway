@@ -356,11 +356,6 @@ variable "stage_variables" {
   description = "A map that defines the stage variables."
 }
 
-variable "xray_tracing_enabled" {
-  type        = bool
-  default     = true
-  description = "A mapping of tags to assign to the resource."
-}
 
 variable "destination_arns" {
   type        = list(any)
