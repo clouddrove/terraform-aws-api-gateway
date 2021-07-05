@@ -79,11 +79,6 @@ jobs:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/complete
 
-      - name: 'Terraform plan for complete'
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'plan'
-          tf_actions_working_dir: ./_example/complete
 
   pre-commit:
     name: 'Pre-Commit'
