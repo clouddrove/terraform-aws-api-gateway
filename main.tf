@@ -33,6 +33,7 @@ resource "aws_api_gateway_rest_api" "default" {
     types = var.types
   }
   policy = var.api_policy
+  tags   = var.tags
 }
 
 # Module      : Api Gateway Resource
