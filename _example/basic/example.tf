@@ -18,7 +18,7 @@ module "api-gateway" {
 
   # Api Gateway Integration
   integration_types        = ["MOCK"]
-  integration_http_methods = ["POST"]
+  integration_http_methods = []
   uri                      = [""]
   integration_request_parameters = [{
     "integration.request.header.X-Authorization" = "'static'"

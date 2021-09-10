@@ -84,7 +84,7 @@ resource "aws_api_gateway_integration" "default" {
   rest_api_id             = aws_api_gateway_rest_api.default.*.id[0]
   resource_id             = aws_api_gateway_resource.default.*.id[count.index]
   http_method             = aws_api_gateway_method.default.*.http_method[count.index]
-  integration_http_method = length(var.integration_http_methods) > 0 ? element(var.integration_http_methods, count.index) : "POST"
+  integration_http_method = length(var.integration_http_methods) > 0 ? element(var.integration_http_methods, count.index) : null
   type                    = length(var.integration_types) > 0 ? element(var.integration_types, count.index) : "AWS_PROXY"
   connection_type         = length(var.connection_types) > 0 ? element(var.connection_types, count.index) : "INTERNET"
   connection_id           = length(var.connection_ids) > 0 ? element(var.connection_ids, count.index) : ""
