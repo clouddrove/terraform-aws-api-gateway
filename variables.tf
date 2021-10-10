@@ -87,6 +87,12 @@ variable "types" {
   description = "Whether to create rest api."
 }
 
+variable "vpc_endpoint_ids" {
+  type        = list(string)
+  default     = []
+  description = "Set of VPC Endpoint identifiers. It is only supported for PRIVATE endpoint type."
+}
+
 variable "path_parts" {
   type        = list(any)
   default     = []
