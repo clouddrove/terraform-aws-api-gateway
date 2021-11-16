@@ -89,7 +89,7 @@ variable "types" {
 
 variable "vpc_endpoint_ids" {
   type        = list(string)
-  default     = []
+  default     = ["", ]
   description = "Set of VPC Endpoint identifiers. It is only supported for PRIVATE endpoint type."
 }
 
