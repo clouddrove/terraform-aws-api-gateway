@@ -29,9 +29,18 @@ resource "aws_api_gateway_rest_api" "default" {
   minimum_compression_size = var.minimum_compression_size
   api_key_source           = var.api_key_source
 
-  endpoint_configuration {
-    types            = var.types
-    vpc_endpoint_ids = var.vpc_endpoint_ids
+  dynamic "endpoint_configuration" {
+    for_each = var.types == "PRIVATE" ? toset([1]) : toset([])
+    content {
+      types            = var.types
+      vpc_endpoint_ids = var.vpc_endpoint_ids
+    }
+  }
+  dynamic "endpoint_configuration" {
+    for_each = var.types != "PRIVATE" ? toset([1]) : toset([])
+    content {
+      types            = var.types
+    }
   }
   policy = var.api_policy
   tags   = var.tags
