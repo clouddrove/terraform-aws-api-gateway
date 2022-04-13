@@ -1,32 +1,47 @@
-name: 'Terraform GitHub Actions'
+name: static-checks
+
 on:
   pull_request:
-    branches:
-      - master
 
 jobs:
-  fmt:
-    name: 'terraform fmt'
+  versionExtract:
+    name: Get min/max versions
     runs-on: ubuntu-latest
+
     steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v2.3.4
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: 'Terraform Format'
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'fmt'
-      - name: 'Terraform Format'
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'fmt'
+      - name: Terraform min/max versions
+        id: minMax
+        uses: clowdhaus/terraform-min-max@main
+    outputs:
+      minVersion: ${{ steps.minMax.outputs.minVersion }}
+      maxVersion: ${{ steps.minMax.outputs.maxVersion }}
 
-  basic:
-    name: 'basic'
+
+  versionEvaluate:
+    name: Evaluate Terraform versions
     runs-on: ubuntu-latest
+    needs: versionExtract
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - ${{ needs.versionExtract.outputs.minVersion }}
+          - ${{ needs.versionExtract.outputs.maxVersion }}
+        directory:
+          - _example/basic
+          - _example/complete
+
     steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v2.3.4
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Terraform v${{ matrix.version }}
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ matrix.version }}
 
       - name: 'Configure AWS Credentials'
         uses: clouddrove/configure-aws-credentials@v1
@@ -35,77 +50,35 @@ jobs:
           aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
           aws-region: us-east-2
 
-      - name: 'Terraform init for basic'
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'init'
-          tf_actions_working_dir: ./_example/basic
-
-      - name: 'Terraform validate for basic'
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'validate'
-          tf_actions_working_dir: ./_example/basic
-
-      - name: 'Terraform plan for basic'
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'plan'
-          tf_actions_working_dir: ./_example/basic
-
-  complete:
-    name: 'complete'
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v2.3.4
-
-      - name: 'Configure AWS Credentials'
-        uses: clouddrove/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
-          aws-region: us-east-2
-
-      - name: 'Terraform init for complete'
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'init'
-          tf_actions_working_dir: ./_example/complete
-
-      - name: 'Terraform validate complete'
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'validate'
-          tf_actions_working_dir: ./_example/complete
-
-
-  pre-commit:
-    name: 'Pre-Commit'
-    needs:
-      - fmt
-      - basic
-      - complete
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v2.3.4
-
-      - name: 'Install Tflint'
+      - name: Init & validate v${{ matrix.version }}
         run: |
-          curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          cd ${{ matrix.directory }}
+          terraform init
+          terraform validate
+          terraform plan -input=false -no-color
 
-      - name: 'Pre-Commit 🔎'
-        uses: pre-commit/action@v2.0.3
-        continue-on-error: true
-
-      - name: 'Slack Notification'
-        uses: clouddrove/action-slack@v2
+      - name: tflint
+        uses: reviewdog/action-tflint@master
         with:
-          status: ${{ job.status }}
-          fields: repo,author
-          author_name: 'CloudDrove'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TERRAFORM }} # required
-        if: always()
+          github_token: ${{ secrets.GITHUB }}
+          working_directory: ${{ matrix.directory }}
+          fail_on_error: 'true'
+          filter_mode: 'nofilter'
+          flags: '--module'
+
+  format:
+    name: Check code format
+    runs-on: ubuntu-latest
+    needs: versionExtract
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Terraform v${{ needs.versionExtract.outputs.maxVersion }}
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ needs.versionExtract.outputs.maxVersion }}
+
+      - name: Check Terraform format changes
+        run: terraform fmt --recursive

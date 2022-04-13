@@ -252,7 +252,7 @@ resource "aws_api_gateway_authorizer" "default" {
   name                             = element(var.authorizer_names, count.index)
   authorizer_uri                   = length(var.authorizer_uri) > 0 ? element(var.authorizer_uri, count.index) : ""
   authorizer_credentials           = length(var.authorizer_credentials) > 0 ? element(var.authorizer_credentials, count.index) : ""
-  authorizer_result_ttl_in_seconds = length(var.authorizer_result_ttl_in_seconds) > 0 ? element(var.authorizer_result_ttl_in_seconds, count.index) : 300
+  authorizer_result_ttFl_in_seconds = length(var.authorizer_result_ttl_in_seconds) > 0 ? element(var.authorizer_result_ttl_in_seconds, count.index) : 300
   identity_source                  = length(var.identity_sources) > 0 ? element(var.identity_sources, count.index) : "method.request.header.Authorization"
   type                             = length(var.authorizer_types) > 0 ? element(var.authorizer_types, count.index) : "TOKEN"
   identity_validation_expression   = length(var.identity_validation_expressions) > 0 ? element(var.identity_validation_expressions, count.index) : ""

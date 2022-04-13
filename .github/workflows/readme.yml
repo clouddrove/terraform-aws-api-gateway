@@ -18,7 +18,7 @@ jobs:
           python-version: '3.x'
 
       - name: 'create readme'
-        uses: 'clouddrove/github-actions@v8.0'
+        uses: 'clouddrove/github-actions@v9.0.1'
         with:
           actions_subcommand: 'readme'
           github_token: '${{ secrets.GITHUB}}'
@@ -35,20 +35,20 @@ jobs:
         continue-on-error: true
 
       - name: 'push readme'
-        uses: 'clouddrove/github-actions@v8.0'
+        uses: 'clouddrove/github-actions@v9.0.1'
         continue-on-error: true
         with:
           actions_subcommand: 'push'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
 
-      - name: 'Slack Notification'
-        uses: clouddrove/action-slack@v2
-        with:
-          status: ${{ job.status }}
-          fields: repo,author
-          author_name: 'CloudDrove'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TERRAFORM }} # required
-        if: always()
+#      - name: 'Slack Notification'
+#        uses: clouddrove/action-slack@v2
+#        with:
+#          status: ${{ job.status }}
+#          fields: repo,author
+#          author_name: 'CloudDrove'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TERRAFORM }} # required
+#        if: always()
