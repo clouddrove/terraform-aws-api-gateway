@@ -42,13 +42,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
 
-      - name: 'Slack Notification'
-        uses: clouddrove/action-slack@v2
-        with:
-          status: ${{ job.status }}
-          fields: repo,author
-          author_name: 'CloudDrove'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TERRAFORM }} # required
-        if: always()
+#      - name: 'Slack Notification'
+#        uses: clouddrove/action-slack@v2
+#        with:
+#          status: ${{ job.status }}
+#          fields: repo,author
+#          author_name: 'CloudDrove'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TERRAFORM }} # required
+#        if: always()
