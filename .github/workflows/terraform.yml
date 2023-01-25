@@ -60,6 +60,7 @@ jobs:
       - name: tflint
         uses: reviewdog/action-tflint@master
         with:
+          tflint_version: v0.29.0
           github_token: ${{ secrets.GITHUB }}
           working_directory: ${{ matrix.directory }}
           fail_on_error: 'true'
