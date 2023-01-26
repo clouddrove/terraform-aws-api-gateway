@@ -79,7 +79,7 @@ Here are examples of how you can use this module in your inventory structure:
 ```hcl
   module "api-gateway" {
     source        = "clouddrove/api-gateway/aws"
-    version       = "1.0.1"
+    version       = "1.3.0"
     name          = "api-gateway"
     environment   = "test"
     label_order   = ["name", "environment"]
@@ -137,7 +137,7 @@ Here are examples of how you can use this module in your inventory structure:
 ```hcl
   module "api-gateway" {
     source        = "clouddrove/api-gateway/aws"
-    version       = "1.0.1"
+    version       = "1.3.0"
 
     name        = "api-gateway"
     environment = "test"
