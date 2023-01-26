@@ -7,7 +7,7 @@
 #              convention.
 module "labels" {
   source  = "clouddrove/labels/aws"
-  version = "0.15.0"
+  version = "1.3.0"
 
   enabled     = var.enabled
   name        = var.name
@@ -278,7 +278,7 @@ resource "aws_api_gateway_vpc_link" "default" {
   count       = var.vpc_link_count > 0 ? var.vpc_link_count : 0
   name        = element(var.vpc_link_names, count.index)
   description = length(var.vpc_link_descriptions) > 0 ? element(var.vpc_link_descriptions, count.index) : ""
-  target_arns = element(var.target_arns, count.index)
+  target_arns = [element(var.target_arns, count.index)]
 }
 
 # Module      : Api Gateway Api Key
