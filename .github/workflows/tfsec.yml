@@ -1,42 +1,11 @@
 name: tfsec
+permissions: write-all
 on:
   pull_request:
-
+  workflow_dispatch:
 jobs:
   tfsec:
-    name: tfsec sarif report
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@master
-
-      - name: tfsec
-        uses: aquasecurity/tfsec-sarif-action@v0.1.0
-        with:
-          sarif_file: tfsec.sarif
-          working_directory: ./_example/
-          full_repo_scan: true
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v1
-        with:
-          # Path to SARIF file relative to the root of the repository
-          sarif_file: tfsec.sarif
-
-      - name: tfsec commenter for PR
-        uses: tfsec/tfsec-pr-commenter-action@main
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB}}
-          working_directory: ./_example/
-
-
-      - name: 'Terraform security scan Advanced'
-        uses: triat/terraform-security-scan@v3.0.3
-        if: github.event_name == 'pull_request'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB}}
-          tfsec_actions_working_dir: ./_example/
-          tfsec_actions_comment: true
-          tfsec_output_format: sarif
-        continue-on-error: true
+    uses: clouddrove/github-shared-workflows/.github/workflows/tfsec.yml@master
+    secrets: inherit
+    with:
+      working_directory: '.'
