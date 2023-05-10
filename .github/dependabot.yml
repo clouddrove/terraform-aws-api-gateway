@@ -13,3 +13,7 @@ updates:
     directory: "_example/complete" # Location of package manifests
     schedule:
       interval: "weekly"
+  - package-ecosystem: "terraform" # See documentation for possible values
+    directory: "_example/basic" # Location of package manifests
+    schedule:
+      interval: "weekly"
