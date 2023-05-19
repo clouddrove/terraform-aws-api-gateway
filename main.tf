@@ -33,8 +33,32 @@ resource "aws_api_gateway_rest_api" "default" {
     types            = var.types
     vpc_endpoint_ids = length(var.vpc_endpoint_ids) > 0 && var.vpc_endpoint_ids[0] != "" ? var.vpc_endpoint_ids : null
   }
-  policy = var.api_policy
   tags   = var.tags
+}
+
+data "aws_iam_policy_document" "test" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = [join("", aws_api_gateway_rest_api.default.*.execution_arn)]
+
+    condition {
+      test     = "IpAddress"
+      variable = "aws:SourceIp"
+      values   = ["123.123.123.123/32"]
+    }
+  }
+}
+
+resource "aws_api_gateway_rest_api_policy" "test" {
+  rest_api_id = join("", aws_api_gateway_rest_api.default.*.id)
+  policy      = data.aws_iam_policy_document.test.json
 }
 
 # Module      : Api Gateway Resource

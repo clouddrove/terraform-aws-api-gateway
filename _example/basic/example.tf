@@ -12,6 +12,9 @@ module "api-gateway" {
   # Api Gateway Resource
   path_parts = ["mytestresource"]
 
+  ##endpoint_configuration
+  types = ["PRIVATE"]
+
   # Api Gateway Method
   method_enabled = true
   http_methods   = ["GET"]
