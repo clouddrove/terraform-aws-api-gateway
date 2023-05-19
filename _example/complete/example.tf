@@ -83,4 +83,29 @@ EOF
   # Api Gateway Api Key
   key_count = 2
   key_names = ["test", "test1"]
+
+  ## Api Policy
+
+  api_policy = data.aws_iam_policy_document.test.json
+
+}
+
+data "aws_iam_policy_document" "test" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = [module.api-gateway.execution_arn]
+
+    condition {
+      test     = "IpAddress"
+      variable = "aws:SourceIp"
+      values   = ["123.123.123.123/32"]
+    }
+  }
 }

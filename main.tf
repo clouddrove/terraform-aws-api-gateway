@@ -33,8 +33,13 @@ resource "aws_api_gateway_rest_api" "default" {
     types            = var.types
     vpc_endpoint_ids = length(var.vpc_endpoint_ids) > 0 && var.vpc_endpoint_ids[0] != "" ? var.vpc_endpoint_ids : null
   }
-  policy = var.api_policy
   tags   = var.tags
+}
+
+
+resource "aws_api_gateway_rest_api_policy" "test" {
+  rest_api_id = join("", aws_api_gateway_rest_api.default.*.id)
+  policy      = var.api_policy
 }
 
 # Module      : Api Gateway Resource

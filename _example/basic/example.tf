@@ -12,6 +12,9 @@ module "api-gateway" {
   # Api Gateway Resource
   path_parts = ["mytestresource"]
 
+  ##endpoint_configuration
+  types = ["PRIVATE"]
+
   # Api Gateway Method
   method_enabled = true
   http_methods   = ["GET"]
@@ -55,4 +58,28 @@ EOF
   # Api Gateway Stage
   stage_enabled = true
   stage_names   = ["qa"]
+  ## Api Policy
+
+  api_policy = data.aws_iam_policy_document.test.json
+
+}
+
+data "aws_iam_policy_document" "test" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = [module.api-gateway.execution_arn]
+
+    condition {
+      test     = "IpAddress"
+      variable = "aws:SourceIp"
+      values   = ["123.123.123.123/32"]
+    }
+  }
 }
