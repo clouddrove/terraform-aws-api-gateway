@@ -36,29 +36,10 @@ resource "aws_api_gateway_rest_api" "default" {
   tags   = var.tags
 }
 
-data "aws_iam_policy_document" "test" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    actions   = ["execute-api:Invoke"]
-    resources = [join("", aws_api_gateway_rest_api.default.*.execution_arn)]
-
-    condition {
-      test     = "IpAddress"
-      variable = "aws:SourceIp"
-      values   = ["123.123.123.123/32"]
-    }
-  }
-}
 
 resource "aws_api_gateway_rest_api_policy" "test" {
   rest_api_id = join("", aws_api_gateway_rest_api.default.*.id)
-  policy      = data.aws_iam_policy_document.test.json
+  policy      = var.api_policy
 }
 
 # Module      : Api Gateway Resource
