@@ -246,7 +246,7 @@ Here are examples of how you can use this module in your inventory structure:
 | binary\_media\_types | The list of binary media types supported by the RestApi. By default, the RestApi supports only UTF-8-encoded text payloads. | `list(any)` | <pre>[<br>  "UTF-8-encoded"<br>]</pre> | no |
 | cache\_cluster\_enableds | Specifies whether a cache cluster is enabled for the stage. | `list(any)` | `[]` | no |
 | cache\_cluster\_sizes | The size of the cache cluster for the stage, if enabled. Allowed values include 0.5, 1.6, 6.1, 13.5, 28.4, 58.2, 118 and 237. | `list(any)` | `[]` | no |
-| cache\_key\_parameters | A list of cache key parameters for the integration. | `list(any)` | `[]` | no |
+| cache\_key\_parameters | A list of cache key parameters for the integration. | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
 | cache\_namespaces | The integration's cache namespace. | `list(any)` | `[]` | no |
 | cert\_description | The description of the client certificate. | `string` | `""` | no |
 | cert\_enabled | Whether to create client certificate. | `bool` | `false` | no |
