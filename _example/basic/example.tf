@@ -20,6 +20,7 @@ module "api-gateway" {
   http_methods   = ["GET"]
 
   # Api Gateway Integration
+  cache_key_parameters = [""]
   integration_types        = ["MOCK"]
   integration_http_methods = []
   uri                      = [""]

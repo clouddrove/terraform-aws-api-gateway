@@ -258,10 +258,11 @@ variable "passthrough_behaviors" {
 }
 
 variable "cache_key_parameters" {
-  type        = list(any)
-  default     = []
+  type        = list(string)
+  default     = [""]
   description = "A list of cache key parameters for the integration."
   sensitive   = true
+
 }
 
 variable "cache_namespaces" {

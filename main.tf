@@ -99,7 +99,7 @@ resource "aws_api_gateway_integration" "default" {
   request_parameters      = length(var.integration_request_parameters) > 0 ? element(var.integration_request_parameters, count.index) : {}
   request_templates       = length(var.request_templates) > 0 ? element(var.request_templates, count.index) : {}
   passthrough_behavior    = length(var.passthrough_behaviors) > 0 ? element(var.passthrough_behaviors, count.index) : null
-  cache_key_parameters    = length(var.cache_key_parameters) > 0 ? element(var.cache_key_parameters, count.index) : []
+  cache_key_parameters    = length(var.cache_key_parameters) > 0 ? var.cache_key_parameters : []
   cache_namespace         = length(var.cache_namespaces) > 0 ? element(var.cache_namespaces, count.index) : ""
   content_handling        = length(var.content_handlings) > 0 ? element(var.content_handlings, count.index) : null
   timeout_milliseconds    = length(var.timeout_milliseconds) > 0 ? element(var.timeout_milliseconds, count.index) : 29000
