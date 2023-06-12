@@ -33,7 +33,7 @@ resource "aws_api_gateway_rest_api" "default" {
     types            = var.types
     vpc_endpoint_ids = length(var.vpc_endpoint_ids) > 0 && var.vpc_endpoint_ids[0] != "" ? var.vpc_endpoint_ids : null
   }
-  tags   = var.tags
+  tags = var.tags
 }
 
 
