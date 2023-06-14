@@ -328,6 +328,8 @@ Here are examples of how you can use this module in your inventory structure:
 |------|-------------|
 | execution\_arn | The Execution ARN of the REST API. |
 | id | The ID of the REST API. |
+| invoke\_url | Input's URI. Required if type is AWS, AWS\_PROXY, HTTP or HTTP\_PROXY. For HTTP integrations, the URI must be a fully formed, encoded HTTP(S) URL according to the RFC-3986 specification |
+| stage\_name | Name of the stage to create with this deployment. If the specified stage already exists, it will be updated to point to the new deployment. |
 | tags | A mapping of tags to assign to the resource. |
 
 
