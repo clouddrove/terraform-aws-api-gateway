@@ -72,9 +72,11 @@ module "api_gateway" {
   environment = "test"
   label_order = ["environment", "name"]
 
-  protocol_type               = "HTTP"
-  domain_name                 = "test-clouddrove.com"
-  domain_name_certificate_arn = module.acm.arn
-  subnet_ids                  = tolist(module.public_subnets.public_subnet_id)
-  security_group_ids          = [module.security_group.security_group_ids]
+  protocol_type                = "HTTP"
+  domain_name                  = "test-clouddrove.com"
+  domain_name_certificate_arn  = module.acm.arn
+  subnet_ids                   = tolist(module.public_subnets.public_subnet_id)
+  security_group_ids           = [module.security_group.security_group_ids]
+  route_selection_expression   = "$request.method $request.path"
+  api_key_selection_expression = "$request.header.x-api-key"
 }

@@ -77,7 +77,7 @@ resource "aws_apigatewayv2_domain_name" "default" {
 resource "aws_route53_record" "default" {
   count = var.enabled ? 1 : 0
 
-  name    =  join("", aws_apigatewayv2_domain_name.default.*.domain_name)
+  name    = join("", aws_apigatewayv2_domain_name.default.*.domain_name)
   type    = "A"
   zone_id = "Z08295059QJZ2CJCU2HZ"
 
