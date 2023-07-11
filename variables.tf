@@ -227,3 +227,23 @@ variable "security_group_ids" {
   description = "A list of security group IDs to associate with."
   sensitive   = true
 }
+
+variable "zone_id" {
+  type    = string
+  default = ""
+}
+variable "iam_arns" {
+  type    = string
+  default = ""
+}
+
+variable "integration_uri" {
+  type        = string
+  default     = ""
+  description = "The path to the function's deployment package within the local filesystem. If defined, The s3_-prefixed options cannot be used."
+}
+variable "integration_type" {
+  type        = list(any)
+  default     = []
+  description = "Label order, e.g. `name`,`application`."
+}

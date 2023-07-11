@@ -13,7 +13,7 @@ output "invoke_url" {
   description = "URL to invoke the API pointing to the stage"
 }
 
-output "integration_response_selection_expression" {
-  value =  join("", aws_apigatewayv2_integration.default.*.integration_response_selection_expression)
-  description = "The integration response selection expression for the integration."
-}
+#output "integration_response_selection_expression" {
+#  value =  aws_apigatewayv2_integration.default.*.integration_response_selection_expression
+#  description = "The integration response selection expression for the integration."
+#}
