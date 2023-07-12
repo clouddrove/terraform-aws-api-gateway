@@ -103,4 +103,8 @@ module "api_gateway" {
       authorizer_key         = "cognito"
     }
   }
+  access_log_settings = {
+    default_stage_access_log_destination_arn = "*"
+    default_stage_access_log_format          = " HTTP"
+  }
 }
