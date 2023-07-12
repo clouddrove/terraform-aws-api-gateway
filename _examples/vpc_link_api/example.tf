@@ -21,6 +21,7 @@ module "vpc" {
 ####----------------------------------------------------------------------------------
 ## A subnet is a range of IP addresses in your VPC.
 ####----------------------------------------------------------------------------------
+#tfsec:ignore:aws-ec2-no-public-ip-subnet.
 module "public_subnets" {
   source  = "clouddrove/subnet/aws"
   version = "1.3.0"
@@ -41,7 +42,6 @@ module "public_subnets" {
 ## Below module will create SECURITY-GROUP and its components.
 ##----------------------------------------------------------------------------------
 #tfsec:ignore:aws-ec2-no-public-ingress-sgr
-#tfsec:ignore:aws-ec2-no-public-ip-subnet.
 module "security_group" {
   source  = "clouddrove/security-group/aws"
   version = "1.3.0"
