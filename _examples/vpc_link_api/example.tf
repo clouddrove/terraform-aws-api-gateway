@@ -40,7 +40,7 @@ module "public_subnets" {
 ##----------------------------------------------------------------------------------
 ## Below module will create SECURITY-GROUP and its components.
 ##----------------------------------------------------------------------------------
-#tfsec:ignore:aws-ec2-no-public-ip-subnet
+#tfsec:ignore:aws-ec2-no-public-ingress-sgr
 module "security_group" {
   source  = "clouddrove/security-group/aws"
   version = "1.3.0"
