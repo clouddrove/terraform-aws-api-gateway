@@ -229,8 +229,8 @@ variable "security_group_ids" {
 }
 
 variable "zone_id" {
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
   description = "The ID of the hosted zone to contain this record."
 }
 variable "integration_uri" {

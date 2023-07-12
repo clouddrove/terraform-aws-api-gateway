@@ -79,8 +79,8 @@ module "api_gateway" {
   domain_name                 = "example.cam"
   domain_name_certificate_arn = module.acm.arn
   integration_uri             = module.lambda.arn
-  zone_id  = "1234059QJ345674343"
-  create_vpc_link_enabled = false
+  zone_id                     = "1234059QJ345674343"
+  create_vpc_link_enabled     = false
   cors_configuration = {
     allow_credentials = true
     allow_methods     = ["GET", "OPTIONS", "POST"]

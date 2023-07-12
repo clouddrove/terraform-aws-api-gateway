@@ -124,13 +124,13 @@ module "api_gateway" {
   environment = "test"
   label_order = ["environment", "name"]
 
-  domain_name                  = "example.cam"
-  create_vpc_link_enabled = true
-  zone_id         = "1`23456059QJZ25345678"
-  integration_uri = module.lambda.arn
-  domain_name_certificate_arn  = module.acm.arn
-  subnet_ids                   = tolist(module.public_subnets.public_subnet_id)
-  security_group_ids           = [module.security_group.security_group_ids]
+  domain_name                 = "example.cam"
+  create_vpc_link_enabled     = true
+  zone_id                     = "1`23456059QJZ25345678"
+  integration_uri             = module.lambda.arn
+  domain_name_certificate_arn = module.acm.arn
+  subnet_ids                  = tolist(module.public_subnets.public_subnet_id)
+  security_group_ids          = [module.security_group.security_group_ids]
   cors_configuration = {
     allow_credentials = true
     allow_methods     = ["GET", "OPTIONS", "POST"]
