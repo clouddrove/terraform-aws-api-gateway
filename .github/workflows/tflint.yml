@@ -1,0 +1,11 @@
+name: tf-lint
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  tf-lint:
+    uses: clouddrove/test-tfsec/.github/workflows/tflint.yaml@master
+    secrets:
+      GITHUB: ${{ secrets.GITHUB }}

@@ -5,7 +5,7 @@
 #
 
 # Name of this project
-name: Terraform AWS Api Gateway
+name : Terraform Module API-GATEWAY-V2
 
 # License of this project
 license: "APACHE"
@@ -15,174 +15,99 @@ github_repo: clouddrove/terraform-aws-api-gateway
 
 # Badges to display
 badges:
-  - name: "Terraform"
-    image: "https://img.shields.io/badge/Terraform-v1.1.7-green"
-    url: "https://www.terraform.io"
-  - name: "Licence"
-    image: "https://img.shields.io/badge/License-APACHE-blue.svg"
-    url: "LICENSE.md"
+  - name: "Latest Release"
+    image: "https://img.shields.io/github/release/clouddrove/terraform-aws-api-gateway.svg"
+    url: "https://github.com/clouddrove/terraform-aws-api-gateway/releases/latest"
   - name: "tfsec"
     image: "https://github.com/clouddrove/terraform-aws-api-gateway/actions/workflows/tfsec.yml/badge.svg"
     url: "https://github.com/clouddrove/terraform-aws-api-gateway/actions/workflows/tfsec.yml"
-  - name: "static-checks"
-    image: "https://github.com/clouddrove/terraform-aws-api-gateway/actions/workflows/terraform.yml/badge.svg"
-    url: "https://github.com/clouddrove/terraform-aws-api-gateway/actions/workflows/terraform.yml"
+  - name: "Licence"
+    image: "https://img.shields.io/badge/License-APACHE-blue.svg"
+    url: "LICENSE.md"
 
 #  description of this project
-# yamllint disable rule:line-length
 description: |-
-  Terraform module to create Route53 resource on AWS for create api gateway with it's basic elements.
-
+  Terraform module api-gateway-v2 to create new modules using this as baseline
 # extra content
-# please not remove these two If you need add more
 include:
   - "terraform.md"
 
 # How to use this project
-# yamllint disable rule:line-length
+# How to use this project
 usage: |-
   Here are examples of how you can use this module in your inventory structure:
-  ### Basic Example
+  ### complete Example
   ```hcl
     module "api-gateway" {
       source        = "clouddrove/api-gateway/aws"
-      version       = "1.3.0"
-      name          = "api-gateway"
-      environment   = "test"
-      label_order   = ["name", "environment"]
-      enabled       = true
-
-    # Api Gateway Resource
-      path_parts = ["mytestresource", "mytestresource1"]
-
-    # Api Gateway Method
-      method_enabled = true
-      http_methods   = ["GET", "GET"]
-
-    # Api Gateway Integration
-      integration_types        = ["MOCK", "AWS_PROXY"]
-      integration_http_methods = ["POST", "POST"]
-      uri                      = ["", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations"]
-      integration_request_parameters = [{
-        "integration.request.header.X-Authorization" = "'static'"
-      }, {}]
-      request_templates = [{
-        "application/xml" = <<EOF
-    {
-       "body" : $input.json('$')
-    }
-    EOF
-      }, {}]
-
-    # Api Gateway Method Response
-      status_codes = [200, 200]
-      response_models = [{ "application/json" = "Empty" }, {}]
-      response_parameters = [{ "method.response.header.X-Some-Header" = true }, {}]
-
-    # Api Gateway Integration Response
-      integration_response_parameters = [{ "method.response.header.X-Some-Header" = "integration.response.header.X-Some-Other-Header" }, {}]
-      response_templates = [{
-        "application/xml" = <<EOF
-    #set($inputRoot = $input.path('$'))
-    <?xml version="1.0" encoding="UTF-8"?>
-    <message>
-        $inputRoot.body
-    </message>
-    EOF
-      }, {}]
-
-    # Api Gateway Deployment
-      deployment_enabled = true
-      stage_name         = "deploy"
-
-    # Api Gateway Stage
-      stage_enabled = true
-      stage_names   = ["qa", "dev"]
+      version       = "1.3.1"
+  
+      domain_name                 = "example.cam"
+      domain_name_certificate_arn = module.acm.arn
+      integration_uri             = module.lambda.arn
+      zone_id  = "1234059QJ345674343"
+      create_vpc_link_enabled = false
+      cors_configuration = {
+        allow_credentials = true
+        allow_methods     = ["GET", "OPTIONS", "POST"]
+        max_age           = 5
+      }
+      integrations = {
+        "ANY /" = {
+          lambda_arn             = module.lambda.arn
+          payload_format_version = "2.0"
+          timeout_milliseconds   = 12000
+        }
+        "GET /some-route-with-authorizer" = {
+          lambda_arn             = module.lambda.arn
+          payload_format_version = "2.0"
+          authorizer_key         = "cognito"
+        }
+        "POST /start-step-function" = {
+          lambda_arn             = module.lambda.arn
+          payload_format_version = "2.0"
+          authorizer_key         = "cognito"
+        }
+      }
     }
   ```
-  ### Complete Example
+  ### vpc_link_api Example
   ```hcl
     module "api-gateway" {
       source        = "clouddrove/api-gateway/aws"
-      version       = "1.3.0"
+      version       = "1.3.1"
 
-      name        = "api-gateway"
+       name        = "api"
       environment = "test"
-      label_order = ["name", "environment"]
-      enabled     = true
-
-    # Api Gateway Resource
-      path_parts = ["mytestresource", "mytestresource1"]
-
-    # Api Gateway Method
-      method_enabled = true
-      http_methods   = ["GET", "GET"]
-
-    # Api Gateway Integration
-      integration_types        = ["MOCK", "AWS_PROXY"]
-      integration_http_methods = ["POST", "POST"]
-      uri                      = ["", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations"]
-      integration_request_parameters = [{
-        "integration.request.header.X-Authorization" = "'static'"
-      }, {}]
-      request_templates = [{
-        "application/xml" = <<EOF
-    {
-       "body" : $input.json('$')
-    }
-    EOF
-      }, {}]
-
-    # Api Gateway Method Response
-      status_codes = [200, 200]
-      response_models = [{ "application/json" = "Empty" }, {}]
-      response_parameters = [{ "method.response.header.X-Some-Header" = true }, {}]
-
-    # Api Gateway Integration Response
-      integration_response_parameters = [{ "method.response.header.X-Some-Header" = "integration.response.header.X-Some-Other-Header" }, {}]
-      response_templates = [{
-        "application/xml" = <<EOF
-    #set($inputRoot = $input.path('$'))
-    <?xml version="1.0" encoding="UTF-8"?>
-    <message>
-        $inputRoot.body
-    </message>
-    EOF
-      }, {}]
-
-    # Api Gateway Deployment
-      deployment_enabled = true
-      stage_name         = "deploy"
-
-    # Api Gateway Stage
-      stage_enabled = true
-      stage_names   = ["qa", "dev"]
-
-    # Api Gateway Client Certificate
-      cert_enabled     = true
-      cert_description = "clouddrove"
-
-    # Api Gateway Authorizer
-      authorizer_count                = 2
-      authorizer_names                = ["test", "test1"]
-      authorizer_uri                  = ["arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations", "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:xxxxxxxxxx:function:test/invocations"]
-      authorizer_credentials          = ["arn:aws:iam::xxxxxxxxxx:role/lambda-role", "arn:aws:iam::xxxxxxxxxx:role/lambda-role"]
-      identity_sources                = ["method.request.header.Authorization", "method.request.header.Authorization"]
-      identity_validation_expressions = ["sfdgfhghrfdsdas", ""]
-      authorizer_types                = ["TOKEN", "REQUEST"]
-
-    # Api Gateway Gateway Response
-      gateway_response_count = 2
-      response_types         = ["UNAUTHORIZED", "RESOURCE_NOT_FOUND"]
-      gateway_status_codes   = ["401", "404"]
-
-    # Api Gateway Model
-      model_count   = 2
-      model_names   = ["test", "test1"]
-      content_types = ["application/json", "application/json"]
-
-    # Api Gateway Api Key
-      key_count = 2
-      key_names = ["test", "test1"]
+      label_order = ["environment", "name"]
+      domain_name                  = "example.cam"
+      create_vpc_link_enabled = true
+      zone_id         = "1`23456059QJZ25345678"
+      integration_uri = module.lambda.arn
+      domain_name_certificate_arn  = module.acm.arn
+      subnet_ids                   = tolist(module.public_subnets.public_subnet_id)
+      security_group_ids           = [module.security_group.security_group_ids]
+      cors_configuration = {
+        allow_credentials = true
+        allow_methods     = ["GET", "OPTIONS", "POST"]
+        max_age           = 5
+      }
+      integrations = {
+        "ANY /" = {
+          lambda_arn             = module.lambda.arn
+          payload_format_version = "2.0"
+          timeout_milliseconds   = 12000
+        }
+        "GET /some-route-with-authorizer" = {
+          lambda_arn             = module.lambda.arn
+          payload_format_version = "2.0"
+          authorizer_key         = "cognito"
+        }
+        "POST /start-step-function" = {
+          lambda_arn             = module.lambda.arn
+          payload_format_version = "2.0"
+          authorizer_key         = "cognito"
+        }
+      }
     }
   ```

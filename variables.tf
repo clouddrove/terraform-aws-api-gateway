@@ -1,12 +1,12 @@
 variable "name" {
   type        = string
-  default     = ""
+  default     = "api"
   description = "Name  (e.g. `app` or `cluster`)."
 }
 
 variable "environment" {
   type        = string
-  default     = ""
+  default     = "test"
   description = "Environment (e.g. `prod`, `dev`, `staging`)."
 }
 
@@ -151,13 +151,13 @@ variable "route_settings" {
 variable "access_log_settings" {
   type        = map(string)
   default     = {}
-  description = "Settings for default route"
+  description = "Settings for logging access in this stage."
 }
 
 variable "default_route_settings" {
   type        = map(string)
   default     = {}
-  description = "Settings for default route"
+  description = "Default route settings for the stage."
 }
 
 variable "create_default_stage_enabled" {
@@ -169,13 +169,13 @@ variable "create_default_stage_enabled" {
 variable "default_stage_access_log_destination_arn" {
   type        = string
   default     = null
-  description = "Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN."
+  description = "ARN of the CloudWatch Logs log group to receive access logs. "
 }
 
 variable "default_stage_access_log_format" {
   type        = string
   default     = null
-  description = "Default stage's single line format of the access logs of data, as specified by selected $context variables."
+  description = "Single line format of the access logs of data. Refer to log settings for HTTP or Websocket."
 }
 
 variable "apigatewayv2_api_mapping_enabled" {
@@ -231,19 +231,50 @@ variable "security_group_ids" {
 variable "zone_id" {
   type    = string
   default = ""
+  description = "The ID of the hosted zone to contain this record."
 }
-variable "iam_arns" {
-  type    = string
-  default = ""
-}
-
 variable "integration_uri" {
   type        = string
   default     = ""
-  description = "The path to the function's deployment package within the local filesystem. If defined, The s3_-prefixed options cannot be used."
+  description = "URI of the Lambda function for a Lambda proxy integration, when integration_type is AWS_PROXY. For an HTTP integration, specify a fully-qualified URL."
 }
+
 variable "integration_type" {
-  type        = list(any)
-  default     = []
-  description = "Label order, e.g. `name`,`application`."
+  type        = string
+  default     = "AWS_PROXY"
+  description = "Integration type of an integration. Valid values: AWS (supported only for WebSocket APIs), AWS_PROXY, HTTP (supported only for WebSocket APIs), HTTP_PROXY, MOCK (supported only for WebSocket APIs). "
+}
+
+variable "authorizer_type" {
+  type        = string
+  default     = "JWT"
+  description = "The authorizer type. Valid values: JWT, REQUEST. For WebSocket APIs, specify REQUEST for a Lambda function using incoming request parameters. For HTTP APIs, specify JWT to use JSON Web Tokens."
+}
+
+variable "identity_sources" {
+  type        = list(string)
+  default     = ["$request.header.Authorization"]
+  description = "The identity sources for which authorization is requested."
+}
+
+variable "connection_type" {
+  type        = string
+  default     = "INTERNET"
+  description = "Type of the network connection to the integration endpoint. Valid values: INTERNET, VPC_LINK. Default is INTERNET."
+}
+variable "integration_description" {
+  type        = string
+  default     = "Lambda example"
+  description = "Description of the integration."
+}
+
+variable "integration_method" {
+  type        = string
+  default     = "POST"
+  description = "Integration's HTTP method. Must be specified if integration_type is not MOCK."
+}
+variable "passthrough_behavior" {
+  type        = string
+  default     = "WHEN_NO_MATCH"
+  description = "Pass-through behavior for incoming requests based on the Content-Type header in the request, and the available mapping templates specified as the request_templates attribute. "
 }

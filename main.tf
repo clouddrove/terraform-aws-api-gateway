@@ -1,3 +1,6 @@
+##----------------------------------------------------------------------------------
+## Labels module callled that will be used for naming and tags.
+##----------------------------------------------------------------------------------
 module "labels" {
   source  = "clouddrove/labels/aws"
   version = "1.3.0"
@@ -9,6 +12,9 @@ module "labels" {
   repository  = var.repository
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Version 2 API.
+##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_api" "default" {
   count = var.enabled && var.create_api_gateway_enabled ? 1 : 0
 
@@ -41,6 +47,9 @@ resource "aws_apigatewayv2_api" "default" {
   )
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Version 2 domain name.
+##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_domain_name" "default" {
   count = var.enabled && var.create_api_domain_name_enabled ? 1 : 0
 
@@ -65,6 +74,10 @@ resource "aws_apigatewayv2_domain_name" "default" {
     }
   )
 }
+
+##----------------------------------------------------------------------------------
+## Below Provides a Route53 record resource.
+##----------------------------------------------------------------------------------
 resource "aws_route53_record" "default" {
   count = var.enabled ? 1 : 0
 
@@ -78,12 +91,14 @@ resource "aws_route53_record" "default" {
   }
 }
 
-
+##----------------------------------------------------------------------------------
+## Below Manages an Amazon API Gateway Version 2 stage.
+##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_stage" "default" {
   count = var.enabled && var.create_default_stage_enabled ? 1 : 0
 
   api_id      = aws_apigatewayv2_api.default[0].id
-  name        = "$default"
+  name        = format("%s-stage", module.labels.id)
   auto_deploy = true
   dynamic "access_log_settings" {
     for_each = var.access_log_settings
@@ -123,6 +138,9 @@ resource "aws_apigatewayv2_stage" "default" {
   )
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Version 2 API mapping.
+##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_api_mapping" "default" {
   count = var.enabled && var.apigatewayv2_api_mapping_enabled ? 1 : 0
 
@@ -131,6 +149,9 @@ resource "aws_apigatewayv2_api_mapping" "default" {
   stage       = join("", aws_apigatewayv2_stage.default.*.id)
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Version 2 route.
+##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_route" "default" {
   for_each = var.enabled && var.create_routes_and_integrations_enabled ? var.integrations : {}
 
@@ -147,18 +168,24 @@ resource "aws_apigatewayv2_route" "default" {
   target                              = "integrations/${join("", aws_apigatewayv2_integration.default.*.id)}"
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Version 2 integration.
+##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_integration" "default" {
   count = var.enabled && var.create_routes_and_integrations_enabled ? 1 : 0
 
   api_id               = join("", aws_apigatewayv2_api.default.*.id)
-  integration_type     = "AWS_PROXY"
-  connection_type      = "INTERNET"
-  description          = "Lambda example"
-  integration_method   = "POST"
+  integration_type     = var.integration_type
+  connection_type      = var.connection_type
+  description          = var.integration_description
+  integration_method   = var.integration_method
   integration_uri      = var.integration_uri
-  passthrough_behavior = "WHEN_NO_MATCH"
+  passthrough_behavior = var.passthrough_behavior
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Version 2 authorizer.
+##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_authorizer" "default" {
   for_each = var.enabled && var.create_routes_and_integrations_enabled ? var.authorizers : {}
 
@@ -173,7 +200,10 @@ resource "aws_apigatewayv2_authorizer" "default" {
   enable_simple_responses           = lookup(each.value.enable_simple_responses, null)
 }
 
-resource "aws_apigatewayv2_vpc_link" "this" {
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Version 2 VPC Link.
+##----------------------------------------------------------------------------------
+resource "aws_apigatewayv2_vpc_link" "default" {
   for_each = var.enabled && var.create_vpc_link_enabled ? var.vpc_links : {}
 
   name               = format("%s", module.labels.id)
@@ -187,17 +217,25 @@ resource "aws_apigatewayv2_vpc_link" "this" {
   )
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Version 2 authorizer.
+##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_authorizer" "some_authorizer" {
+  count = var.enabled && var.create_routes_and_integrations_enabled ? 1 : 0
+
   api_id           = aws_apigatewayv2_api.default[0].id
-  authorizer_type  = "JWT"
-  identity_sources = ["$request.header.Authorization"]
-  name             = "testtt"
+  authorizer_type  = var.authorizer_type
+  identity_sources = var.identity_sources
+  name             = module.labels.id
   jwt_configuration {
     audience = ["example"]
-    issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
+    issuer   = "https://${aws_cognito_user_pool.default.endpoint}"
   }
 }
 
-resource "aws_cognito_user_pool" "this" {
-  name = "user-pool"
+##----------------------------------------------------------------------------------
+## Below resource will Provides a Cognito User Pool resource.
+##----------------------------------------------------------------------------------
+resource "aws_cognito_user_pool" "default" {
+  name = module.labels.id
 }
