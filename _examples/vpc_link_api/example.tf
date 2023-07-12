@@ -21,6 +21,7 @@ module "vpc" {
 ####----------------------------------------------------------------------------------
 ## A subnet is a range of IP addresses in your VPC.
 ####----------------------------------------------------------------------------------
+#tfsec:ignore:Subnet associates public IP address.
 module "public_subnets" {
   source  = "clouddrove/subnet/aws"
   version = "1.3.0"
