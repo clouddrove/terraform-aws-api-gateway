@@ -67,8 +67,8 @@ module "acm" {
   label_order = ["name", "environment"]
 
   enable_aws_certificate    = true
-  domain_name               = "example.cam"
-  subject_alternative_names = ["*.example.cam"]
+  domain_name               = "clouddrove.ca"
+  subject_alternative_names = ["*.clouddrove.ca"]
   validation_method         = "DNS"
   enable_dns_validation     = false
 }
@@ -126,7 +126,7 @@ module "api_gateway" {
   environment = "test"
   label_order = ["environment", "name"]
 
-  domain_name                 = "example.cam"
+  domain_name                 = "clouddrove.ca"
   create_vpc_link_enabled     = true
   zone_id                     = "1`23456059QJZ25345678"
   integration_uri             = module.lambda.arn

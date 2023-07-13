@@ -17,8 +17,8 @@ module "acm" {
   label_order = ["name", "environment"]
 
   enable_aws_certificate    = true
-  domain_name               = "example.cam"
-  subject_alternative_names = ["*.example.cam"]
+  domain_name               = "clouddrove.ca"
+  subject_alternative_names = ["*.clouddrove.ca"]
   validation_method         = "DNS"
   enable_dns_validation     = false
 }
@@ -76,7 +76,7 @@ module "api_gateway" {
   environment = "test"
   label_order = ["environment", "name"]
 
-  domain_name                 = "example.cam"
+  domain_name                 = "clouddrove.ca"
   domain_name_certificate_arn = module.acm.arn
   integration_uri             = module.lambda.arn
   zone_id                     = "1234059QJ345674343"
@@ -102,9 +102,5 @@ module "api_gateway" {
       payload_format_version = "2.0"
       authorizer_key         = "cognito"
     }
-  }
-  access_log_settings = {
-    default_stage_access_log_destination_arn = "*"
-    default_stage_access_log_format          = " HTTP"
   }
 }
