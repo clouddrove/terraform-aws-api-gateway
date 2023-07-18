@@ -48,7 +48,6 @@ module "security_group" {
 
   name          = "security-group"
   environment   = "test"
-  protocol      = "tcp"
   label_order   = ["environment", "name"]
   vpc_id        = module.vpc.vpc_id
   allowed_ip    = ["0.0.0.0/0"]
