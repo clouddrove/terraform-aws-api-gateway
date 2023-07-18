@@ -40,7 +40,7 @@ usage: |-
   ```hcl
     module "api-gateway" {
       source        = "clouddrove/api-gateway/aws"
-      version       = "1.3.1"
+      version       = "1.4.0"
   
       domain_name                 = "example.cam"
       domain_name_certificate_arn = module.acm.arn
@@ -75,7 +75,7 @@ usage: |-
   ```hcl
     module "api-gateway" {
       source        = "clouddrove/api-gateway/aws"
-      version       = "1.3.1"
+      version       = "1.4.0"
 
        name        = "api"
       environment = "test"
