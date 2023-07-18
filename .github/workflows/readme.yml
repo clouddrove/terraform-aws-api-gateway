@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@master
 
       - name: 'Set up Python 3.7'
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
@@ -21,17 +21,17 @@ jobs:
         uses: 'clouddrove/github-actions@v9.0.2'
         with:
           actions_subcommand: 'readme'
-          github_token: '${{ secrets.GITHUB}}'
+          github_token: '${{ secrets.GITHUB }}'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
       - name: 'pre-commit check errors'
-        uses: pre-commit/action@v2.0.0
+        uses: pre-commit/action@v3.0.0
         continue-on-error: true
 
-      - name: 'pre-commit fix errors'
-        uses: pre-commit/action@v2.0.0
+      - name: 'pre-commit fix erros'
+        uses: pre-commit/action@v3.0.0
         continue-on-error: true
 
       - name: 'push readme'
@@ -40,7 +40,7 @@ jobs:
         with:
           actions_subcommand: 'push'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Slack Notification'
         uses: clouddrove/action-slack@v2
