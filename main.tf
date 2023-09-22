@@ -85,8 +85,8 @@ resource "aws_route53_record" "default" {
   type    = "A"
   zone_id = var.zone_id
   alias {
-    name                   = join("", aws_apigatewayv2_domain_name.default.*.domain_name_configuration[0].*.target_domain_name)
-    zone_id                = join("", aws_apigatewayv2_domain_name.default.*.domain_name_configuration[0].*.hosted_zone_id)
+    name                   = join("", aws_apigatewayv2_domain_name.default[*].domain_name_configuration[0].target_domain_name)
+    zone_id                = join("", aws_apigatewayv2_domain_name.default[*].domain_name_configuration[0].hosted_zone_id)
     evaluate_target_health = false
   }
 }
