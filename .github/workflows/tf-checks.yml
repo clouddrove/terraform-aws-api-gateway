@@ -8,8 +8,8 @@ jobs:
   tf-checks-complete-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
-      working_directory: './_examples/complete/'
+      working_directory: './_example/complete/'
   tf-checks-basic-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
-      working_directory: './_examples/vpc_link_api/'
+      working_directory: './_example/vpc_link_api/'

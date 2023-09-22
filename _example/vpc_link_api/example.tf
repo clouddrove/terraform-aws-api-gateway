@@ -57,7 +57,7 @@ module "security_group" {
     to_port     = 22
     cidr_blocks = [module.vpc.vpc_cidr_block, "172.16.0.0/16"]
     description = "Allow ssh traffic."
-  },
+    },
     {
       rule_count  = 2
       from_port   = 27017
@@ -76,7 +76,7 @@ module "security_group" {
     to_port     = 22
     cidr_blocks = [module.vpc.vpc_cidr_block, "172.16.0.0/16"]
     description = "Allow ssh outbound traffic."
-  },
+    },
     {
       rule_count  = 2
       from_port   = 27017
@@ -84,7 +84,7 @@ module "security_group" {
       to_port     = 27017
       cidr_blocks = ["172.16.0.0/16"]
       description = "Allow Mongodb outbound traffic."
-    }]
+  }]
 }
 
 ####----------------------------------------------------------------------------------
