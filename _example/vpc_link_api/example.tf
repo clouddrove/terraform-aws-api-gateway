@@ -24,7 +24,7 @@ module "vpc" {
 #tfsec:ignore:aws-ec2-no-public-ip-subnet
 module "public_subnets" {
   source  = "clouddrove/subnet/aws"
-  version = "1.3.0"
+  version = "2.0.0"
 
   name        = "public-subnet"
   environment = "test"
@@ -43,15 +43,48 @@ module "public_subnets" {
 ##----------------------------------------------------------------------------------
 #tfsec:ignore:aws-ec2-no-public-ingress-sgr
 module "security_group" {
-  source  = "clouddrove/security-group/aws"
-  version = "2.0.0"
+  source      = "clouddrove/security-group/aws"
+  version     = "2.0.0"
+  name        = "test"
+  environment = "security-group"
+  vpc_id      = module.vpc.vpc_id
 
-  name          = "security-group"
-  environment   = "test"
-  label_order   = ["environment", "name"]
-  vpc_id        = module.vpc.vpc_id
-  allowed_ip    = ["0.0.0.0/0"]
-  allowed_ports = [3306]
+  ## INGRESS Rules
+  new_sg_ingress_rules_with_cidr_blocks = [{
+    rule_count  = 1
+    from_port   = 22
+    protocol    = "tcp"
+    to_port     = 22
+    cidr_blocks = [module.vpc.vpc_cidr_block, "172.16.0.0/16"]
+    description = "Allow ssh traffic."
+  },
+    {
+      rule_count  = 2
+      from_port   = 27017
+      protocol    = "tcp"
+      to_port     = 27017
+      cidr_blocks = ["172.16.0.0/16"]
+      description = "Allow Mongodb traffic."
+    }
+  ]
+
+  ## EGRESS Rules
+  new_sg_egress_rules_with_cidr_blocks = [{
+    rule_count  = 1
+    from_port   = 22
+    protocol    = "tcp"
+    to_port     = 22
+    cidr_blocks = [module.vpc.vpc_cidr_block, "172.16.0.0/16"]
+    description = "Allow ssh outbound traffic."
+  },
+    {
+      rule_count  = 2
+      from_port   = 27017
+      protocol    = "tcp"
+      to_port     = 27017
+      cidr_blocks = ["172.16.0.0/16"]
+      description = "Allow Mongodb outbound traffic."
+    }]
 }
 
 ####----------------------------------------------------------------------------------
@@ -59,7 +92,7 @@ module "security_group" {
 ####----------------------------------------------------------------------------------
 module "acm" {
   source  = "clouddrove/acm/aws"
-  version = "1.3.0"
+  version = "1.4.0"
 
   name        = "certificate"
   environment = "test"
@@ -131,7 +164,7 @@ module "api_gateway" {
   integration_uri             = module.lambda.arn
   domain_name_certificate_arn = module.acm.arn
   subnet_ids                  = tolist(module.public_subnets.public_subnet_id)
-  security_group_ids          = [module.security_group.security_group_ids]
+  security_group_ids          = [module.security_group.security_group_id]
   cors_configuration = {
     allow_credentials = true
     allow_methods     = ["GET", "OPTIONS", "POST"]

@@ -3,9 +3,8 @@ on:
   push:
     branches:
       - master
-
 jobs:
-  readme-create:
+  readme:
     name: 'readme-create'
     runs-on: ubuntu-latest
     steps:

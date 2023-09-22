@@ -81,7 +81,7 @@ resource "aws_apigatewayv2_domain_name" "default" {
 resource "aws_route53_record" "default" {
   count = var.enabled ? 1 : 0
 
-  name    = join("", aws_apigatewayv2_domain_name.default.*.domain_name)
+  name    = join("", aws_apigatewayv2_domain_name.default[*].domain_name)
   type    = "A"
   zone_id = var.zone_id
   alias {
@@ -94,6 +94,7 @@ resource "aws_route53_record" "default" {
 ##----------------------------------------------------------------------------------
 ## Below Manages an Amazon API Gateway Version 2 stage.
 ##----------------------------------------------------------------------------------
+#tfsec:ignore:aws-api-gateway-enable-access-logging
 resource "aws_apigatewayv2_stage" "default" {
   count = var.enabled && var.create_default_stage_enabled ? 1 : 0
 
@@ -144,9 +145,9 @@ resource "aws_apigatewayv2_stage" "default" {
 resource "aws_apigatewayv2_api_mapping" "default" {
   count = var.enabled && var.apigatewayv2_api_mapping_enabled ? 1 : 0
 
-  api_id      = join("", aws_apigatewayv2_api.default.*.id)
-  domain_name = join("", aws_apigatewayv2_domain_name.default.*.id)
-  stage       = join("", aws_apigatewayv2_stage.default.*.id)
+  api_id      = join("", aws_apigatewayv2_api.default[*].id)
+  domain_name = join("", aws_apigatewayv2_domain_name.default[*].id)
+  stage       = join("", aws_apigatewayv2_stage.default[*].id)
 }
 
 ##----------------------------------------------------------------------------------
@@ -165,7 +166,7 @@ resource "aws_apigatewayv2_route" "default" {
   model_selection_expression          = try(each.value.model_selection_expression, null)
   operation_name                      = try(each.value.operation_name, null)
   route_response_selection_expression = try(each.value.route_response_selection_expression, null)
-  target                              = "integrations/${join("", aws_apigatewayv2_integration.default.*.id)}"
+  target                              = "integrations/${join("", aws_apigatewayv2_integration.default[*].id)}"
 }
 
 ##----------------------------------------------------------------------------------
@@ -174,7 +175,7 @@ resource "aws_apigatewayv2_route" "default" {
 resource "aws_apigatewayv2_integration" "default" {
   count = var.enabled && var.create_routes_and_integrations_enabled ? 1 : 0
 
-  api_id               = join("", aws_apigatewayv2_api.default.*.id)
+  api_id               = join("", aws_apigatewayv2_api.default[*].id)
   integration_type     = var.integration_type
   connection_type      = var.connection_type
   description          = var.integration_description
