@@ -10,7 +10,7 @@ provider "aws" {
 ####----------------------------------------------------------------------------------
 module "acm" {
   source  = "clouddrove/acm/aws"
-  version = "1.3.0"
+  version = "1.4.1"
 
   name        = "certificate"
   environment = "test"
