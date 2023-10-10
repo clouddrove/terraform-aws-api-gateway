@@ -97,7 +97,7 @@ module "http_https" {
     to_port     = 22
     cidr_blocks = [local.vpc_cidr_block]
     description = "Allow ssh traffic."
-  },
+    },
     {
       rule_count  = 2
       from_port   = 80
@@ -133,7 +133,7 @@ module "http_https" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
     description      = "Allow all traffic."
-  }
+    }
   ]
 }
 
