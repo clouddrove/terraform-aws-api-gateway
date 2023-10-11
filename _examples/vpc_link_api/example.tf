@@ -8,6 +8,8 @@ provider "aws" {
 locals {
   vpc_cidr_block        = module.vpc.vpc_cidr_block
   additional_cidr_block = "172.16.0.0/16"
+  name                  = "api"
+  environment           = "test"
 }
 ####----------------------------------------------------------------------------------
 ## A VPC is a virtual network that closely resembles a traditional network that you'd operate in your own data center.
@@ -16,11 +18,9 @@ module "vpc" {
   source  = "clouddrove/vpc/aws"
   version = "2.0.0"
 
-  name        = "vpc"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  cidr_block = "172.16.0.0/16"
+  name        = local.name
+  environment = local.environment
+  cidr_block  = "172.16.0.0/16"
 }
 
 ####----------------------------------------------------------------------------------
@@ -31,10 +31,8 @@ module "public_subnets" {
   source  = "clouddrove/subnet/aws"
   version = "2.0.0"
 
-  name        = "public-subnet"
-  environment = "test"
-  label_order = ["name", "environment"]
-
+  name               = local.name
+  environment        = local.environment
   availability_zones = ["eu-west-1b", "eu-west-1c"]
   vpc_id             = module.vpc.vpc_id
   cidr_block         = module.vpc.vpc_cidr_block
@@ -55,9 +53,8 @@ module "ssh" {
   source  = "clouddrove/security-group/aws"
   version = "2.0.0"
 
-  name        = "ssh"
-  environment = "test"
-  label_order = ["name", "environment"]
+  name        = local.name
+  environment = local.environment
   vpc_id      = module.vpc.vpc_id
   new_sg_ingress_rules_with_cidr_blocks = [{
     rule_count  = 1
@@ -84,11 +81,9 @@ module "http_https" {
   source  = "clouddrove/security-group/aws"
   version = "2.0.0"
 
-  name        = "http-https"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  vpc_id = module.vpc.vpc_id
+  name        = local.name
+  environment = local.environment
+  vpc_id      = module.vpc.vpc_id
   ## INGRESS Rules
   new_sg_ingress_rules_with_cidr_blocks = [{
     rule_count  = 1
@@ -144,10 +139,8 @@ module "acm" {
   source  = "clouddrove/acm/aws"
   version = "1.4.1"
 
-  name        = "certificate"
-  environment = "test"
-  label_order = ["name", "environment"]
-
+  name                      = local.name
+  environment               = local.environment
   enable_aws_certificate    = true
   domain_name               = "clouddrove.ca"
   subject_alternative_names = ["*.clouddrove.ca"]
@@ -162,15 +155,13 @@ module "lambda" {
   source  = "clouddrove/lambda/aws"
   version = "1.3.0"
 
-  name        = "lambda"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  enabled  = true
-  timeout  = 60
-  filename = "./lambda_packages"
-  handler  = "index.lambda_handler"
-  runtime  = "python3.8"
+  name        = local.name
+  environment = local.environment
+  enabled     = true
+  timeout     = 60
+  filename    = "./lambda_packages"
+  handler     = "index.lambda_handler"
+  runtime     = "python3.8"
   iam_actions = [
     "logs:CreateLogStream",
     "logs:CreateLogGroup",
@@ -204,10 +195,8 @@ module "lambda" {
 module "api_gateway" {
   source = "./../../"
 
-  name        = "api"
-  environment = "test"
-  label_order = ["environment", "name"]
-
+  name                        = local.name
+  environment                 = local.environment
   domain_name                 = "clouddrove.ca"
   create_vpc_link_enabled     = true
   zone_id                     = "1`23456059QJZ25345678"
