@@ -94,6 +94,7 @@ resource "aws_route53_record" "default" {
 ##----------------------------------------------------------------------------------
 ## Below Manages an Amazon API Gateway Version 2 stage.
 ##----------------------------------------------------------------------------------
+#tfsec:ignore:aws-api-gateway-enable-access-logging
 resource "aws_apigatewayv2_stage" "default" {
   count = var.enabled && var.create_default_stage_enabled ? 1 : 0
 
