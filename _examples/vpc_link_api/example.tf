@@ -4,6 +4,13 @@
 provider "aws" {
   region = "eu-west-1"
 }
+
+locals {
+  vpc_cidr_block        = module.vpc.vpc_cidr_block
+  additional_cidr_block = "172.16.0.0/16"
+  name                  = "api"
+  environment           = "test"
+}
 ####----------------------------------------------------------------------------------
 ## A VPC is a virtual network that closely resembles a traditional network that you'd operate in your own data center.
 ####----------------------------------------------------------------------------------
@@ -11,11 +18,9 @@ module "vpc" {
   source  = "clouddrove/vpc/aws"
   version = "2.0.0"
 
-  name        = "vpc"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  cidr_block = "172.16.0.0/16"
+  name        = local.name
+  environment = local.environment
+  cidr_block  = "172.16.0.0/16"
 }
 
 ####----------------------------------------------------------------------------------
@@ -24,12 +29,10 @@ module "vpc" {
 #tfsec:ignore:aws-ec2-no-public-ip-subnet
 module "public_subnets" {
   source  = "clouddrove/subnet/aws"
-  version = "1.3.0"
+  version = "2.0.0"
 
-  name        = "public-subnet"
-  environment = "test"
-  label_order = ["name", "environment"]
-
+  name               = local.name
+  environment        = local.environment
   availability_zones = ["eu-west-1b", "eu-west-1c"]
   vpc_id             = module.vpc.vpc_id
   cidr_block         = module.vpc.vpc_cidr_block
@@ -41,17 +44,92 @@ module "public_subnets" {
 ##----------------------------------------------------------------------------------
 ## Below module will create SECURITY-GROUP and its components.
 ##----------------------------------------------------------------------------------
-#tfsec:ignore:aws-ec2-no-public-ingress-sgr
-module "security_group" {
+
+# ################################################################################
+# Security Groups module call
+################################################################################
+
+module "ssh" {
   source  = "clouddrove/security-group/aws"
   version = "2.0.0"
 
-  name          = "security-group"
-  environment   = "test"
-  label_order   = ["environment", "name"]
-  vpc_id        = module.vpc.vpc_id
-  allowed_ip    = ["0.0.0.0/0"]
-  allowed_ports = [3306]
+  name        = local.name
+  environment = local.environment
+  vpc_id      = module.vpc.vpc_id
+  new_sg_ingress_rules_with_cidr_blocks = [{
+    rule_count  = 1
+    from_port   = 22
+    protocol    = "tcp"
+    to_port     = 22
+    cidr_blocks = [local.vpc_cidr_block, local.additional_cidr_block]
+    description = "Allow ssh traffic."
+  }]
+
+  ## EGRESS Rules
+  new_sg_egress_rules_with_cidr_blocks = [{
+    rule_count  = 1
+    from_port   = 22
+    protocol    = "tcp"
+    to_port     = 22
+    cidr_blocks = [local.vpc_cidr_block, local.additional_cidr_block]
+    description = "Allow ssh outbound traffic."
+  }]
+}
+
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
+module "http_https" {
+  source  = "clouddrove/security-group/aws"
+  version = "2.0.0"
+
+  name        = local.name
+  environment = local.environment
+  vpc_id      = module.vpc.vpc_id
+  ## INGRESS Rules
+  new_sg_ingress_rules_with_cidr_blocks = [{
+    rule_count  = 1
+    from_port   = 22
+    protocol    = "tcp"
+    to_port     = 22
+    cidr_blocks = [local.vpc_cidr_block]
+    description = "Allow ssh traffic."
+    },
+    {
+      rule_count  = 2
+      from_port   = 80
+      protocol    = "tcp"
+      to_port     = 80
+      cidr_blocks = [local.vpc_cidr_block]
+      description = "Allow http traffic."
+    },
+    {
+      rule_count  = 3
+      from_port   = 443
+      protocol    = "tcp"
+      to_port     = 443
+      cidr_blocks = [local.vpc_cidr_block]
+      description = "Allow https traffic."
+    },
+    {
+      rule_count  = 3
+      from_port   = 3306
+      protocol    = "tcp"
+      to_port     = 3306
+      cidr_blocks = [local.vpc_cidr_block]
+      description = "Allow https traffic."
+    }
+  ]
+
+  ## EGRESS Rules
+  new_sg_egress_rules_with_cidr_blocks = [{
+    rule_count       = 1
+    from_port        = 0
+    protocol         = "-1"
+    to_port          = 0
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    description      = "Allow all traffic."
+    }
+  ]
 }
 
 ####----------------------------------------------------------------------------------
@@ -59,12 +137,10 @@ module "security_group" {
 ####----------------------------------------------------------------------------------
 module "acm" {
   source  = "clouddrove/acm/aws"
-  version = "1.3.0"
+  version = "1.4.1"
 
-  name        = "certificate"
-  environment = "test"
-  label_order = ["name", "environment"]
-
+  name                      = local.name
+  environment               = local.environment
   enable_aws_certificate    = true
   domain_name               = "clouddrove.ca"
   subject_alternative_names = ["*.clouddrove.ca"]
@@ -79,15 +155,13 @@ module "lambda" {
   source  = "clouddrove/lambda/aws"
   version = "1.3.0"
 
-  name        = "lambda"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  enabled  = true
-  timeout  = 60
-  filename = "./lambda_packages"
-  handler  = "index.lambda_handler"
-  runtime  = "python3.8"
+  name        = local.name
+  environment = local.environment
+  enabled     = true
+  timeout     = 60
+  filename    = "./lambda_packages"
+  handler     = "index.lambda_handler"
+  runtime     = "python3.8"
   iam_actions = [
     "logs:CreateLogStream",
     "logs:CreateLogGroup",
@@ -121,17 +195,15 @@ module "lambda" {
 module "api_gateway" {
   source = "./../../"
 
-  name        = "api"
-  environment = "test"
-  label_order = ["environment", "name"]
-
+  name                        = local.name
+  environment                 = local.environment
   domain_name                 = "clouddrove.ca"
   create_vpc_link_enabled     = true
   zone_id                     = "1`23456059QJZ25345678"
   integration_uri             = module.lambda.arn
   domain_name_certificate_arn = module.acm.arn
   subnet_ids                  = tolist(module.public_subnets.public_subnet_id)
-  security_group_ids          = [module.security_group.security_group_ids]
+  security_group_ids          = [module.ssh.security_group_id, module.http_https.security_group_id]
   cors_configuration = {
     allow_credentials = true
     allow_methods     = ["GET", "OPTIONS", "POST"]

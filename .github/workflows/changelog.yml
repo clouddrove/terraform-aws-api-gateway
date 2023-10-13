@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   call-workflow-changelog:
-    uses: clouddrove/github-shared-workflows/.github/workflows/changelog.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/changelog.yml@1.0.6
     secrets: inherit
     with:
       branch: 'master'

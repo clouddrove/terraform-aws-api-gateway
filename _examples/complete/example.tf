@@ -5,17 +5,19 @@ provider "aws" {
   region = "eu-west-1"
 }
 
+locals {
+  name        = "api"
+  environment = "test"
+}
 ####----------------------------------------------------------------------------------
 ## This terraform module is designed to generate consistent label names and tags for resources.
 ####----------------------------------------------------------------------------------
 module "acm" {
   source  = "clouddrove/acm/aws"
-  version = "1.3.0"
+  version = "1.4.1"
 
-  name        = "certificate"
-  environment = "test"
-  label_order = ["name", "environment"]
-
+  name                      = local.name
+  environment               = local.environment
   enable_aws_certificate    = true
   domain_name               = "clouddrove.ca"
   subject_alternative_names = ["*.clouddrove.ca"]
@@ -30,15 +32,13 @@ module "lambda" {
   source  = "clouddrove/lambda/aws"
   version = "1.3.0"
 
-  name        = "lambda"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  enabled  = true
-  timeout  = 60
-  filename = "./lambda_packages"
-  handler  = "index.lambda_handler"
-  runtime  = "python3.8"
+  name        = local.name
+  environment = local.environment
+  enabled     = true
+  timeout     = 60
+  filename    = "./lambda_packages"
+  handler     = "index.lambda_handler"
+  runtime     = "python3.8"
   iam_actions = [
     "logs:CreateLogStream",
     "logs:CreateLogGroup",
@@ -72,10 +72,8 @@ module "lambda" {
 module "api_gateway" {
   source = "./../../"
 
-  name        = "api"
-  environment = "test"
-  label_order = ["environment", "name"]
-
+  name                        = local.name
+  environment                 = local.environment
   domain_name                 = "clouddrove.ca"
   domain_name_certificate_arn = module.acm.arn
   integration_uri             = module.lambda.arn
