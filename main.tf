@@ -99,8 +99,8 @@ resource "aws_apigatewayv2_stage" "default" {
   count = var.enabled && var.create_default_stage_enabled ? 1 : 0
 
   api_id      = aws_apigatewayv2_api.default[0].id
-  name        = format("%s-stage", module.labels.id)
-  auto_deploy = false
+  name        = var.stage_name != null ? var.stage_name : format("%s-stage", module.labels.id)
+  auto_deploy = var.auto_deploy
   dynamic "access_log_settings" {
     for_each = var.access_log_settings
     content {
