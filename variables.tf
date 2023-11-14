@@ -266,3 +266,15 @@ variable "passthrough_behavior" {
   default     = "WHEN_NO_MATCH"
   description = "Pass-through behavior for incoming requests based on the Content-Type header in the request, and the available mapping templates specified as the request_templates attribute. "
 }
+
+variable "stage_name" {
+  type        = string
+  default     = null
+  description = "Stage Name to be used, set to `$default` to use Invoke URL as your default webpage for lambda"
+}
+
+variable "auto_deploy" {
+  type        = bool
+  default     = false
+  description = "Set this to true to enable stage Auto Deployment"
+}
