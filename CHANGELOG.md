@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2023-11-15
+### :sparkles: New Features
+- [`3264a48`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/3264a489ebdf1664dfcfb101777eb28a5b7c5d50) - Added new vpc tag *(commit by [@theprashantyadav](https://github.com/theprashantyadav))*
+- [`233d34b`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/233d34bb997fe4cc561ec80bc1a383f27a796992) - custome stage name and auto-deploy variable *(PR [#54](https://github.com/clouddrove/terraform-aws-api-gateway/pull/54) by [@h1manshu98](https://github.com/h1manshu98))*
+
+### :construction_worker: Build System
+- [`38d53b0`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/38d53b0e1361bc77c09aaca8895cedfdb369651a) - **deps**: bump clouddrove/vpc/aws in /_examples/vpc_link_api *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+
+### :memo: Documentation Changes
+- [`e9191ea`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/e9191ea607d6d0bba54ad64adf3926d57c75af88) - update CHANGELOG.md for 1.4.0 *(commit by [@clouddrove-ci](https://github.com/clouddrove-ci))*
+
+
 ## [1.4.0] - 2023-07-18
 ### :sparkles: New Features
 - [`fc7b2c3`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/fc7b2c3ecdbe0dd8d92e6078afbc5368ac60930f) - added changelog.yml file use shared workflow *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
@@ -88,3 +100,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.0.1]: https://github.com/clouddrove/terraform-aws-api-gateway/tree/1.0.1
 
 [1.4.0]: https://github.com/clouddrove/terraform-aws-api-gateway/compare/1.0.1...1.4.0
+[1.4.1]: https://github.com/clouddrove/terraform-aws-api-gateway/compare/1.4.0...1.4.1
