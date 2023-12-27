@@ -1,3 +1,4 @@
+---
 name: tf-lint
 on:
   push:
@@ -6,6 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   tf-lint:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-lint.yml@1.0.6
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-lint.yml@1.0.9
     secrets:
       GITHUB: ${{ secrets.GITHUB }}
+...
