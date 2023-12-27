@@ -1,3 +1,4 @@
+---
 name: changelog
 permissions: write-all
 on:
@@ -7,7 +8,8 @@ on:
   workflow_dispatch:
 jobs:
   call-workflow-changelog:
-    uses: clouddrove/github-shared-workflows/.github/workflows/changelog.yml@1.0.6
+    uses: clouddrove/github-shared-workflows/.github/workflows/changelog.yml@1.0.9
     secrets: inherit
     with:
       branch: 'master'
+...
