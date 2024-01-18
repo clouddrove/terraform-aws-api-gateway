@@ -8,7 +8,7 @@ provider "aws" {
 locals {
   name        = "api"
   environment = "test"
-  domain_name = "tech-tycoons.clouddrove.ca"
+  domain_name = "clouddrove.ca"
   region      = "eu-west-1"
 }
 ####----------------------------------------------------------------------------------
@@ -49,7 +49,6 @@ module "lambda" {
   names = [
     "python_layer"
   ]
-  # layer_filenames = ["./lambda-test.zip"]
   compatible_runtimes = [
     ["python3.8"]
   ]
@@ -78,7 +77,7 @@ module "api_gateway" {
   domain_name                 = "clouddrove.ca"
   domain_name_certificate_arn = module.acm.arn
   integration_uri             = module.lambda.invoke_arn
-  zone_id                     = "1234059QJ345674343"
+  zone_id                     = "1234059QJ34567xxxx"
   create_vpc_link_enabled     = false
   cors_configuration = {
     allow_credentials = true
@@ -121,7 +120,7 @@ module "rest_api" {
 
   # -- Required
   domain_name = local.domain_name
-  zone_id     = "Z01564602K369XB8J3IEP"
+  zone_id     = "Z01564602K369XBxxxx"
 }
 
 ####----------------------------------------------------------------------------------
@@ -222,7 +221,7 @@ module "rest_api_private" {
 
   # -- Required
   domain_name = "api.${local.domain_name}"
-  zone_id     = "Z01564602K369XB8J3IEP"
+  zone_id     = "Z01564602K369XB8Jxxxx"
 
   # -- VPC Endpoint configuration
   vpc_id                      = module.vpc.vpc_id

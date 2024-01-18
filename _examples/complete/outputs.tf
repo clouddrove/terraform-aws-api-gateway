@@ -17,3 +17,7 @@ output "invoke_url" {
   value       = join("", module.api_gateway[*].invoke_url)
   description = "URL to invoke the API pointing to the stage"
 }
+
+
+
+

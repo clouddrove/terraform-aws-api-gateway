@@ -39,12 +39,7 @@ resource "aws_apigatewayv2_api" "default" {
       max_age           = try(cors_configuration.value.max_age, null)
     }
   }
-  tags = merge(
-    module.labels.tags,
-    {
-      "Name" = format("%s", module.labels.id)
-    }
-  )
+  tags = module.labels.tags
 }
 
 ##----------------------------------------------------------------------------------
@@ -67,12 +62,7 @@ resource "aws_apigatewayv2_domain_name" "default" {
       truststore_version = lookup(mutual_tls_authentication.value.truststore_version, null)
     }
   }
-  tags = merge(
-    module.labels.tags,
-    {
-      "Name" = format("%s-domain", module.labels.id)
-    }
-  )
+  tags = module.labels.tags
 }
 
 ##----------------------------------------------------------------------------------
@@ -131,12 +121,7 @@ resource "aws_apigatewayv2_stage" "default" {
       throttling_rate_limit    = lookup(route_settings.value, "throttling_rate_limit", null)
     }
   }
-  tags = merge(
-    module.labels.tags,
-    {
-      "Name" = format("%s-stage", module.labels.id)
-    }
-  )
+  tags = module.labels.tags
 }
 
 ##----------------------------------------------------------------------------------
@@ -210,12 +195,8 @@ resource "aws_apigatewayv2_vpc_link" "default" {
   name               = format("%s", module.labels.id)
   security_group_ids = var.security_group_ids
   subnet_ids         = var.subnet_ids
-  tags = merge(
-    module.labels.tags,
-    {
-      "Name" = format("%s-vpc-link", module.labels.id)
-    }
-  )
+  tags               = module.labels.tags
+
 }
 
 ##----------------------------------------------------------------------------------
@@ -416,6 +397,9 @@ resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
   provider_arns                    = var.provider_arns
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API IAM role.
+##----------------------------------------------------------------------------------
 resource "aws_iam_role" "rest_api_iam_role" {
   count              = var.enabled && var.create_rest_api_gateway_authorizer && var.create_rest_api ? 1 : 0
   name               = format("%s-iam-role", module.labels.id)
