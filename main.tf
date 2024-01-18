@@ -16,7 +16,7 @@ module "labels" {
 ## Below resource will Manages an Amazon API Gateway Version 2 API.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_api" "default" {
-  count = var.enabled && var.create_api_gateway_enabled ? 1 : 0
+  count = var.enabled && var.create_api_gateway_enabled && var.create_http_api ? 1 : 0
 
   name                         = format("%s", module.labels.id)
   description                  = var.api_description
@@ -51,7 +51,7 @@ resource "aws_apigatewayv2_api" "default" {
 ## Below resource will Manages an Amazon API Gateway Version 2 domain name.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_domain_name" "default" {
-  count = var.enabled && var.create_api_domain_name_enabled ? 1 : 0
+  count = var.enabled && var.create_api_domain_name_enabled && (var.create_http_api || var.create_rest_api) ? 1 : 0
 
   domain_name = var.domain_name
   domain_name_configuration {
@@ -79,7 +79,7 @@ resource "aws_apigatewayv2_domain_name" "default" {
 ## Below Provides a Route53 record resource.
 ##----------------------------------------------------------------------------------
 resource "aws_route53_record" "default" {
-  count = var.enabled ? 1 : 0
+  count = var.enabled && (var.create_http_api || var.create_rest_api) ? 1 : 0
 
   name    = join("", aws_apigatewayv2_domain_name.default[*].domain_name)
   type    = "A"
@@ -96,7 +96,7 @@ resource "aws_route53_record" "default" {
 ##----------------------------------------------------------------------------------
 #tfsec:ignore:aws-api-gateway-enable-access-logging
 resource "aws_apigatewayv2_stage" "default" {
-  count = var.enabled && var.create_default_stage_enabled ? 1 : 0
+  count = var.enabled && var.create_default_stage_enabled && var.create_http_api ? 1 : 0
 
   api_id      = aws_apigatewayv2_api.default[0].id
   name        = var.stage_name != null ? var.stage_name : format("%s-stage", module.labels.id)
@@ -143,7 +143,7 @@ resource "aws_apigatewayv2_stage" "default" {
 ## Below resource will Manages an Amazon API Gateway Version 2 API mapping.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_api_mapping" "default" {
-  count = var.enabled && var.apigatewayv2_api_mapping_enabled ? 1 : 0
+  count = var.enabled && var.apigatewayv2_api_mapping_enabled && var.create_http_api ? 1 : 0
 
   api_id      = join("", aws_apigatewayv2_api.default[*].id)
   domain_name = join("", aws_apigatewayv2_domain_name.default[*].id)
@@ -154,7 +154,7 @@ resource "aws_apigatewayv2_api_mapping" "default" {
 ## Below resource will Manages an Amazon API Gateway Version 2 route.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_route" "default" {
-  for_each = var.enabled && var.create_routes_and_integrations_enabled ? var.integrations : {}
+  for_each = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? var.integrations : {}
 
   api_id    = aws_apigatewayv2_api.default[0].id
   route_key = each.key
@@ -173,7 +173,7 @@ resource "aws_apigatewayv2_route" "default" {
 ## Below resource will Manages an Amazon API Gateway Version 2 integration.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_integration" "default" {
-  count = var.enabled && var.create_routes_and_integrations_enabled ? 1 : 0
+  count = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? 1 : 0
 
   api_id               = join("", aws_apigatewayv2_api.default[*].id)
   integration_type     = var.integration_type
@@ -188,7 +188,7 @@ resource "aws_apigatewayv2_integration" "default" {
 ## Below resource will Manages an Amazon API Gateway Version 2 authorizer.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_authorizer" "default" {
-  for_each = var.enabled && var.create_routes_and_integrations_enabled ? var.authorizers : {}
+  for_each = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? var.authorizers : {}
 
   api_id                            = aws_apigatewayv2_api.default[0].id
   authorizer_type                   = lookup(each.value.authorizer_type, null)
@@ -205,7 +205,7 @@ resource "aws_apigatewayv2_authorizer" "default" {
 ## Below resource will Manages an Amazon API Gateway Version 2 VPC Link.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_vpc_link" "default" {
-  for_each = var.enabled && var.create_vpc_link_enabled ? var.vpc_links : {}
+  for_each = var.enabled && var.create_vpc_link_enabled && var.create_http_api ? var.vpc_links : {}
 
   name               = format("%s", module.labels.id)
   security_group_ids = var.security_group_ids
@@ -222,7 +222,7 @@ resource "aws_apigatewayv2_vpc_link" "default" {
 ## Below resource will Manages an Amazon API Gateway Version 2 authorizer.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_authorizer" "some_authorizer" {
-  count = var.enabled && var.create_routes_and_integrations_enabled ? 1 : 0
+  count = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? 1 : 0
 
   api_id           = aws_apigatewayv2_api.default[0].id
   authorizer_type  = var.authorizer_type
@@ -239,4 +239,215 @@ resource "aws_apigatewayv2_authorizer" "some_authorizer" {
 ##----------------------------------------------------------------------------------
 resource "aws_cognito_user_pool" "default" {
   name = module.labels.id
+}
+
+##----------------------------------------------------------------------------------
+## Below resource will Provides a REST API resource.
+##----------------------------------------------------------------------------------
+resource "aws_api_gateway_rest_api" "rest_api" {
+  count = var.enabled && var.create_rest_api_gateway && var.create_rest_api ? 1 : 0
+
+  name        = format("%s", module.labels.id)
+  description = var.rest_api_description
+  tags        = module.labels.tags
+
+  endpoint_configuration {
+    types            = [var.rest_api_endpoint_type]
+    vpc_endpoint_ids = var.rest_api_endpoint_type == "PRIVATE" ? [aws_vpc_endpoint.rest_api_private[0].id] : null
+  }
+
+  policy = var.rest_api_endpoint_type != "PRIVATE" ? null : <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "execute-api:/*",
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:sourceVpce": "${aws_vpc_endpoint.rest_api_private[0].id}"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "execute-api:/*"
+        }
+    ]
+}
+  EOF
+}
+
+resource "aws_api_gateway_deployment" "rest_api_deployment" {
+  count             = var.enabled && var.create_rest_api_deployment && var.create_rest_api ? 1 : 0
+  rest_api_id       = aws_api_gateway_rest_api.rest_api[0].id
+  description       = var.api_deployment_description
+  stage_description = var.stage_description
+  variables         = var.rest_variables
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.rest_api[0].body,
+      aws_api_gateway_rest_api.rest_api[0].root_resource_id,
+      aws_api_gateway_method.rest_api_method[0].id,
+      aws_api_gateway_integration.rest_api_integration[0].id,
+      aws_api_gateway_integration.rest_api_integration[0].id,
+    ]))
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Method.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_method" "rest_api_method" {
+  count         = var.enabled && var.create_rest_api_gateway_method && var.create_rest_api ? 1 : 0
+  authorization = var.authorization
+  http_method   = var.http_method
+  resource_id   = aws_api_gateway_rest_api.rest_api[0].root_resource_id
+  rest_api_id   = aws_api_gateway_rest_api.rest_api[0].id
+}
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway integration.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_integration" "rest_api_integration" {
+  count                   = var.enabled && var.create_rest_api_gateway_integration && var.create_rest_api ? 1 : 0
+  rest_api_id             = aws_api_gateway_rest_api.rest_api[0].id
+  resource_id             = aws_api_gateway_method.rest_api_method[0].resource_id
+  http_method             = aws_api_gateway_method.rest_api_method[0].http_method
+  integration_http_method = var.integration_http_method
+  connection_type         = var.connection_rest_api_type
+  connection_id           = var.connection_id
+  credentials             = var.credentials
+  request_templates       = var.request_templates
+  request_parameters      = var.request_parameters
+  cache_namespace         = var.cache_namespace
+  content_handling        = var.content_handling
+  cache_key_parameters    = var.cache_key_parameters
+  type                    = var.gateway_integration_type
+  timeout_milliseconds    = var.timeout_milliseconds
+  uri                     = var.integration_uri
+}
+
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway stage.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_stage" "rest_api_stage" {
+  count                 = var.enabled && var.create_rest_api_gateway_stage && var.create_rest_api ? 1 : 0
+  description           = var.description_gateway_stage
+  deployment_id         = aws_api_gateway_deployment.rest_api_deployment[0].id
+  rest_api_id           = aws_api_gateway_rest_api.rest_api[0].id
+  stage_name            = var.rest_api_stage_name
+  cache_cluster_enabled = var.cache_cluster_enabled
+  cache_cluster_size    = var.cache_cluster_size
+  client_certificate_id = var.client_certificate_id
+  documentation_version = var.documentation_version
+  variables             = var.stage_variables
+  xray_tracing_enabled  = var.xray_tracing_enabled
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  canary_settings {
+    percent_traffic          = var.percent_traffic
+    stage_variable_overrides = var.stage_variable_overrides
+    use_stage_cache          = var.use_stage_cache
+  }
+
+  tags = module.labels.tags
+}
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Method Response.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_method_response" "rest_api_method_response" {
+  count               = var.enabled && var.create_rest_api_gateway_method_response && var.create_rest_api ? 1 : 0
+  rest_api_id         = aws_api_gateway_rest_api.rest_api[0].id
+  resource_id         = aws_api_gateway_rest_api.rest_api[0].root_resource_id
+  http_method         = aws_api_gateway_method.rest_api_method[0].http_method
+  status_code         = var.status_code
+  response_models     = var.response_models
+  response_parameters = var.response_parameters
+}
+
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Integration Response.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_integration_response" "rest_api_integration_response" {
+  count               = var.enabled && var.create_rest_api_gateway_integration_response && var.create_rest_api ? 1 : 0
+  rest_api_id         = aws_api_gateway_rest_api.rest_api[0].id
+  resource_id         = aws_api_gateway_method.rest_api_method[0].resource_id
+  http_method         = aws_api_gateway_method.rest_api_method[0].http_method
+  status_code         = aws_api_gateway_method_response.rest_api_method_response[0].status_code
+  content_handling    = var.content_handling
+  response_parameters = var.integration_response_parameters
+  depends_on = [
+    aws_api_gateway_method.rest_api_method,
+    aws_api_gateway_integration.rest_api_integration
+  ]
+}
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Gateway Authorizer.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
+  count                            = var.enabled && var.create_rest_api_gateway_authorizer && var.create_rest_api ? 1 : 0
+  name                             = var.gateway_authorizer
+  rest_api_id                      = aws_api_gateway_rest_api.rest_api[0].id
+  authorizer_uri                   = var.integration_uri
+  authorizer_credentials           = var.authorizer_iam_role != "" ? var.authorizer_iam_role : aws_iam_role.rest_api_iam_role[0].arn
+  identity_source                  = var.identity_source
+  type                             = var.type
+  authorizer_result_ttl_in_seconds = var.authorizer_result_ttl_in_seconds
+  provider_arns                    = var.provider_arns
+}
+
+resource "aws_iam_role" "rest_api_iam_role" {
+  count              = var.enabled && var.create_rest_api_gateway_authorizer && var.create_rest_api ? 1 : 0
+  name               = format("%s-iam-role", module.labels.id)
+  path               = "/"
+  assume_role_policy = var.rest_api_assume_role_policy != "" ? var.rest_api_assume_role_policy : <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+##-----------------------------------------------------------------------
+# REST API PRIVATE: This only requires VPC ENDPOINT and RESOURCE POLICY
+##-----------------------------------------------------------------------
+resource "aws_vpc_endpoint" "rest_api_private" {
+  count = var.enabled && var.create_rest_api && var.rest_api_endpoint_type == "PRIVATE" ? 1 : 0
+
+  vpc_id              = var.vpc_id
+  service_name        = var.service_name
+  vpc_endpoint_type   = var.vpc_endpoint_type
+  private_dns_enabled = var.private_dns_enabled
+
+  subnet_ids         = var.subnet_ids
+  security_group_ids = var.security_group_ids
 }
