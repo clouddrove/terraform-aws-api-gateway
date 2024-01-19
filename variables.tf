@@ -301,8 +301,9 @@ variable "create_rest_api_gateway" {
 variable "rest_api_endpoint_type" {
   type        = string
   description = "The type of the endpoint. One of - PUBLIC, PRIVATE, REGIONAL"
-  default     = ""
+  default     = null
 }
+
 
 variable "rest_api_policy" {
   description = "The IAM policy document for the API."
@@ -642,6 +643,38 @@ variable "rest_api_assume_role_policy" {
   description = "(optional) Custome Trust Relationship Policy for Authorizer IAMRole."
 }
 
+variable "rest_api_base_path" {
+  type        = string
+  default     = ""
+  description = " Path segment that must be prepended to the path when accessing the API via this mapping. If omitted, the API is exposed at the root of the given domain."
+}
+
+variable "rest_api_endpoint_policy" {
+  type        = string
+  default     = null
+  description = "IAM policy document in JSON format"
+}
+
+variable "rest_api_role" {
+  type        = string
+  default     = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+  description = "IAM policy document in JSON format"
+}
+
 ##-----------------------------------------------------------------------
 # REST API PRIVATE: This only requires VPC ENDPOINT and RESOURCE POLICY
 ##-----------------------------------------------------------------------
@@ -673,3 +706,10 @@ variable "private_dns_enabled" {
   default     = false
   description = "AWS services and AWS Marketplace partner services only) Whether or not to associate a private hosted zone with the specified VPC. Applicable for endpoints of type Interface. Most users will want this enabled to allow services within the VPC to automatically use the endpoint. Defaults to false."
 }
+
+variable "rest_api_private_vpc_endpoint_id" {
+  type        = string
+  default     = ""
+  description = "ID of the VPC endpoint for the private REST API"
+}
+

@@ -237,7 +237,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
     vpc_endpoint_ids = var.rest_api_endpoint_type == "PRIVATE" ? [aws_vpc_endpoint.rest_api_private[0].id] : null
   }
 
-  policy = var.rest_api_endpoint_type != "PRIVATE" ? null : <<EOF
+  policy = var.rest_api_endpoint_type != "PRIVATE" ? null : var.rest_api_endpoint_policy != "" ? var.rest_api_endpoint_policy : <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -262,6 +262,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
 }
   EOF
 }
+
 
 resource "aws_api_gateway_deployment" "rest_api_deployment" {
   count             = var.enabled && var.create_rest_api_deployment && var.create_rest_api ? 1 : 0
@@ -398,27 +399,26 @@ resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
 }
 
 ##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon API Base Path Mapping.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_base_path_mapping" "Rest_api_base_path" {
+  count       = var.enabled && var.create_rest_api_gateway_authorizer && var.create_rest_api ? 1 : 0
+  api_id      = aws_api_gateway_rest_api.rest_api[0].id
+  domain_name = var.domain_name
+  base_path   = var.rest_api_base_path
+  stage_name  = var.rest_api_stage_name
+}
+
+##----------------------------------------------------------------------------------
 ## Below resource will Manages an Amazon API IAM role.
 ##----------------------------------------------------------------------------------
 resource "aws_iam_role" "rest_api_iam_role" {
   count              = var.enabled && var.create_rest_api_gateway_authorizer && var.create_rest_api ? 1 : 0
   name               = format("%s-iam-role", module.labels.id)
   path               = "/"
-  assume_role_policy = var.rest_api_assume_role_policy != "" ? var.rest_api_assume_role_policy : <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+  assume_role_policy = var.rest_api_assume_role_policy != "" ? var.rest_api_assume_role_policy : var.rest_api_role
+
 }
 
 ##-----------------------------------------------------------------------

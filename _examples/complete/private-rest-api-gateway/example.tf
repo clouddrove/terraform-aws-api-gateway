@@ -1,15 +1,8 @@
-####----------------------------------------------------------------------------------
-## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
-####----------------------------------------------------------------------------------
-provider "aws" {
-  region = local.region
-}
-
 locals {
   name        = "api"
   environment = "test"
   domain_name = "clouddrove.ca"
-  region      = "eu-west-1"
+  region      = "ap-south-1"
 }
 ####----------------------------------------------------------------------------------
 ## This terraform module is designed to generate consistent label names and tags for resources.
@@ -38,7 +31,7 @@ module "lambda" {
   environment = local.environment
   enable      = true
   timeout     = 60
-  filename    = "./lambda_packages/index.zip"
+  filename    = "../lambda_packages/index.zip"
   handler     = "index.lambda_handler"
   runtime     = "python3.8"
   iam_actions = [
@@ -66,65 +59,9 @@ module "lambda" {
   }
 }
 
-####----------------------------------------------------------------------------------
-## This terraform module is designed to generate consistent label names and tags for resources.
-####----------------------------------------------------------------------------------
-module "api_gateway" {
-  source = "./../../"
-
-  name                        = local.name
-  environment                 = local.environment
-  domain_name                 = "clouddrove.ca"
-  domain_name_certificate_arn = module.acm.arn
-  integration_uri             = module.lambda.invoke_arn
-  zone_id                     = "1234059QJ34567xxxx"
-  create_vpc_link_enabled     = false
-  cors_configuration = {
-    allow_credentials = true
-    allow_methods     = ["GET", "OPTIONS", "POST"]
-    max_age           = 5
-  }
-  integrations = {
-    "ANY /" = {
-      lambda_arn             = module.lambda.arn
-      payload_format_version = "2.0"
-      timeout_milliseconds   = 12000
-    }
-    "GET /some-route-with-authorizer" = {
-      lambda_arn             = module.lambda.arn
-      payload_format_version = "2.0"
-      authorizer_key         = "cognito"
-    }
-    "POST /start-step-function" = {
-      lambda_arn             = module.lambda.arn
-      payload_format_version = "2.0"
-      authorizer_key         = "cognito"
-    }
-  }
-}
 
 ####----------------------------------------------------------------------------------
-## REST API
-####----------------------------------------------------------------------------------
-module "rest_api" {
-  source = "../../"
-
-  name        = "${local.name}-rest-api"
-  environment = local.environment
-
-  create_rest_api        = true
-  rest_api_description   = "REST API for ${module.lambda.name} lambda function"
-  rest_api_endpoint_type = "REGIONAL"
-  integration_uri        = module.lambda.invoke_arn
-  rest_api_stage_name    = "test"
-
-  # -- Required
-  domain_name = local.domain_name
-  zone_id     = "Z01564602K369XBxxxx"
-}
-
-####----------------------------------------------------------------------------------
-## REST API
+## REST API PRIVATE
 ####----------------------------------------------------------------------------------
 module "vpc" {
   source  = "clouddrove/vpc/aws"
@@ -207,7 +144,7 @@ module "security_group" {
 }
 
 module "rest_api_private" {
-  source = "../../"
+  source = "../../../"
 
   name        = "${local.name}-rest-api-private"
   environment = local.environment
@@ -218,17 +155,19 @@ module "rest_api_private" {
   integration_uri        = module.lambda.invoke_arn
   rest_api_stage_name    = "test"
   auto_deploy            = true
-
+  rest_api_base_path     = "test"
   # -- Required
   domain_name = "api.${local.domain_name}"
-  zone_id     = "Z01564602K369XB8Jxxxx"
+  zone_id     = "Z01564602K369XBxxxxx"
 
   # -- VPC Endpoint configuration
   vpc_id                      = module.vpc.vpc_id
-  service_name                = "com.amazonaws.eu-west-1.execute-api"
+  service_name                = "com.amazonaws.ap-south-1.execute-api"
   vpc_endpoint_type           = "Interface"
   private_dns_enabled         = true
   subnet_ids                  = module.subnets.private_subnet_id
   security_group_ids          = [module.security_group.security_group_id]
   domain_name_certificate_arn = module.acm.arn
+
+
 }
