@@ -300,45 +300,45 @@ variable "create_rest_api_gateway" {
 
 variable "rest_api_endpoint_type" {
   type        = string
-  description = "The type of the endpoint. One of - PUBLIC, PRIVATE, REGIONAL"
   default     = null
+  description = "The type of the endpoint. One of - PUBLIC, PRIVATE, REGIONAL"
 }
 
 
 variable "rest_api_policy" {
-  description = "The IAM policy document for the API."
   type        = string
   default     = ""
+  description = "The IAM policy document for the API."
 }
 
 variable "xray_tracing_enabled" {
-  description = "A flag to indicate whether to enable X-Ray tracing."
   type        = bool
   default     = false
+  description = "A flag to indicate whether to enable X-Ray tracing."
 }
 
 variable "metrics_enabled" {
-  description = "A flag to indicate whether to enable metrics collection."
   type        = bool
   default     = false
+  description = "A flag to indicate whether to enable metrics collection."
 }
 
 variable "logging_level" {
   type        = string
-  description = "The logging level of the API. One of - OFF, INFO, ERROR"
   default     = "INFO"
+  description = "The logging level of the API. One of - OFF, INFO, ERROR"
 }
 
 variable "data_trace_enabled" {
   type        = bool
-  description = ""
   default     = false
+  description = "Specifies whether data trace logging is enabled for this method, which effects the log entries pushed to Amazon CloudWatch Logs."
 }
 
 variable "vpc_endpoint_ids" {
   type        = string
-  description = "The type of the endpoint. One of - PUBLIC, PRIVATE, REGIONAL"
   default     = ""
+  description = "The type of the endpoint. One of - PUBLIC, PRIVATE, REGIONAL"
 }
 
 variable "create_rest_api_deployment" {
@@ -389,6 +389,12 @@ variable "create_rest_api_gateway_authorizer" {
   description = "Flag to control the rest api gateway authorizer creation."
 }
 
+variable "create_rest_api_gateway_resource" {
+  type        = bool
+  default     = true
+  description = "flag to control the rest api gateway resources creation"
+}
+
 variable "gateway_authorizer" {
   type        = string
   default     = "demo"
@@ -428,13 +434,13 @@ variable "http_method" {
 variable "authorization" {
   type        = string
   default     = "NONE"
-  description = "(optional) describe your variable"
+  description = "  Required The type of authorization used for the method (NONE, CUSTOM, AWS_IAM, COGNITO_USER_POOLS)"
 }
 
 variable "rest_api_description" {
   type        = string
   default     = "test"
-  description = "(optional) describe your variable"
+  description = "The description of the REST API"
 }
 
 variable "connection_rest_api_type" {
@@ -572,7 +578,7 @@ variable "use_stage_cache" {
 variable "rest_api_stage_name" {
   type        = string
   default     = ""
-  description = "(optional) describe your variable"
+  description = "The name of the stage"
 }
 
 variable "response_models" {
@@ -580,7 +586,7 @@ variable "response_models" {
   default = {
     "application/json" = "Empty"
   }
-  description = "(optional) describe your variable"
+  description = "A map of the API models used for the response's content type"
 }
 
 variable "response_parameters" {
@@ -637,6 +643,7 @@ variable "authorizer_iam_role" {
   description = "(optional) Custome IAMRole for Authorizer Credentials."
 }
 
+
 variable "rest_api_assume_role_policy" {
   type        = string
   default     = ""
@@ -647,6 +654,12 @@ variable "rest_api_base_path" {
   type        = string
   default     = ""
   description = " Path segment that must be prepended to the path when accessing the API via this mapping. If omitted, the API is exposed at the root of the given domain."
+}
+
+variable "api_resources" {
+  type        = map(map(string))
+  default     = {}
+  description = "flag to control of resources path"
 }
 
 variable "rest_api_endpoint_policy" {
@@ -712,4 +725,7 @@ variable "rest_api_private_vpc_endpoint_id" {
   default     = ""
   description = "ID of the VPC endpoint for the private REST API"
 }
+
+
+
 

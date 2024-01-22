@@ -25,8 +25,8 @@ output "invoke_url" {
 # REST API
 ##-------------------------------------------------------------
 output "rest_api_id" {
-  value       = join("", aws_api_gateway_rest_api.rest_api[*].id)
-  description = "the Rest Api Id."
+  value       = aws_api_gateway_rest_api.rest_api[*].id
+  description = " The ID of the REST API"
 }
 
 output "rest_api_arn" {
@@ -36,5 +36,7 @@ output "rest_api_arn" {
 
 output "rest_api_invoke_url" {
   value       = join("", aws_api_gateway_stage.rest_api_stage[*].invoke_url)
-  description = "The Rest Api invoke URL"
+  description = "The URL to invoke the API pointing to the stage"
 }
+
+

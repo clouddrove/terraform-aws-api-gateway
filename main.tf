@@ -263,6 +263,9 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   EOF
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon REST API Gateway Deployment.
+##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_deployment" "rest_api_deployment" {
   count             = var.enabled && var.create_rest_api_deployment && var.create_rest_api ? 1 : 0
@@ -285,7 +288,54 @@ resource "aws_api_gateway_deployment" "rest_api_deployment" {
 }
 
 ##----------------------------------------------------------------------------------
-## Below resource will Manages an Amazon API Gateway Method.
+## Below resource will Manages an Amazon REST API Gateway Resource.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_resource" "api_resources" {
+
+  for_each    = var.enabled && var.create_rest_api_gateway_resource && var.create_rest_api ? var.api_resources : {}
+  rest_api_id = aws_api_gateway_rest_api.rest_api[0].id
+  parent_id   = aws_api_gateway_rest_api.rest_api[0].root_resource_id
+  path_part   = each.value.path_part
+}
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon REST API Gateway Method.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_method" "api_methods" {
+  for_each      = var.enabled && var.create_rest_api_gateway_method && var.create_rest_api ? var.api_resources : {}
+  rest_api_id   = aws_api_gateway_rest_api.rest_api[0].id
+  resource_id   = aws_api_gateway_resource.api_resources[each.key].id
+  http_method   = each.value.http_method
+  authorization = var.authorization
+}
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon REST API Gateway Integration.
+##----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_integration" "api_integrations" {
+  for_each                = var.enabled && var.create_rest_api_gateway_integration && var.create_rest_api ? var.api_resources : {}
+  rest_api_id             = aws_api_gateway_rest_api.rest_api[0].id
+  resource_id             = aws_api_gateway_resource.api_resources[each.key].id
+  http_method             = aws_api_gateway_method.api_methods[each.key].http_method
+  integration_http_method = var.integration_http_method
+  type                    = var.gateway_integration_type
+  uri                     = each.value.uri
+  connection_type         = var.connection_rest_api_type
+  connection_id           = var.connection_id
+  credentials             = var.credentials
+  request_templates       = var.request_templates
+  request_parameters      = var.request_parameters
+  cache_namespace         = var.cache_namespace
+  content_handling        = var.content_handling
+  cache_key_parameters    = var.cache_key_parameters
+}
+
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon REST API Gateway Method.
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_method" "rest_api_method" {
@@ -297,7 +347,7 @@ resource "aws_api_gateway_method" "rest_api_method" {
 }
 
 ##----------------------------------------------------------------------------------
-## Below resource will Manages an Amazon API Gateway integration.
+## Below resource will Manages an Amazon REST API Gateway integration.
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_integration" "rest_api_integration" {
@@ -321,7 +371,7 @@ resource "aws_api_gateway_integration" "rest_api_integration" {
 
 
 ##----------------------------------------------------------------------------------
-## Below resource will Manages an Amazon API Gateway stage.
+## Below resource will Manages an Amazon REST API Gateway stage.
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_stage" "rest_api_stage" {
@@ -350,7 +400,7 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
 }
 
 ##----------------------------------------------------------------------------------
-## Below resource will Manages an Amazon API Gateway Method Response.
+## Below resource will Manages an Amazon REST API Gateway Method Response.
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_method_response" "rest_api_method_response" {
@@ -365,7 +415,7 @@ resource "aws_api_gateway_method_response" "rest_api_method_response" {
 
 
 ##----------------------------------------------------------------------------------
-## Below resource will Manages an Amazon API Gateway Integration Response.
+## Below resource will Manages an Amazon REST API Gateway Integration Response.
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_integration_response" "rest_api_integration_response" {
@@ -383,7 +433,7 @@ resource "aws_api_gateway_integration_response" "rest_api_integration_response" 
 }
 
 ##----------------------------------------------------------------------------------
-## Below resource will Manages an Amazon API Gateway Authorizer.
+## Below resource will Manages an Amazon REST API Gateway Authorizer.
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
@@ -399,7 +449,7 @@ resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
 }
 
 ##----------------------------------------------------------------------------------
-## Below resource will Manages an Amazon API Base Path Mapping.
+## Below resource will Manages an Amazon REST API Base Path Mapping.
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_base_path_mapping" "Rest_api_base_path" {
@@ -435,3 +485,7 @@ resource "aws_vpc_endpoint" "rest_api_private" {
   subnet_ids         = var.subnet_ids
   security_group_ids = var.security_group_ids
 }
+
+
+
+

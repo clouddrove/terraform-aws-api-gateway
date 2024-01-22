@@ -8,8 +8,8 @@ provider "aws" {
 locals {
   name        = "api"
   environment = "test"
-  domain_name = "clouddrove.ca"
-  region      = "eu-west-1"
+  domain_name = "tech-tycoons.clouddrove.ca"
+  region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
 ## This terraform module is designed to generate consistent label names and tags for resources.
@@ -81,10 +81,23 @@ module "rest_api" {
   rest_api_endpoint_type      = "REGIONAL"
   integration_uri             = module.lambda.invoke_arn
   rest_api_stage_name         = "test"
+  api_resources = {
+    users = {
+      path_part   = "users"
+      http_method = "ANY"
+      uri         = module.lambda.invoke_arn
+
+    },
+    cards = {
+      path_part   = "cards"
+      http_method = "ANY"
+      uri         = module.lambda.invoke_arn
+    }
+  }
 
   # -- Required
-  domain_name   = local.domain_name
-  zone_id       = "Z01564602K369XB8xxxxx"
+  domain_name   = "api.${local.domain_name}"
+  zone_id       = "Z01564602K369XB8J3IEP"
   rest_api_role = <<EOF
 {
   "Version": "2012-10-17",
@@ -101,3 +114,5 @@ module "rest_api" {
 }
 EOF
 }
+
+
