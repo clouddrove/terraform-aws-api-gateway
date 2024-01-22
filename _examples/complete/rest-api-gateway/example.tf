@@ -8,7 +8,7 @@ provider "aws" {
 locals {
   name        = "api"
   environment = "test"
-  domain_name = "tech-tycoons.clouddrove.ca"
+  domain_name = "clouddrove.ca"
   region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ module "rest_api" {
 
   # -- Required
   domain_name   = "api.${local.domain_name}"
-  zone_id       = "Z01564602K369XB8J3IEP"
+  zone_id       = "Z01564602K369XB8xxxxx"
   rest_api_role = <<EOF
 {
   "Version": "2012-10-17",
