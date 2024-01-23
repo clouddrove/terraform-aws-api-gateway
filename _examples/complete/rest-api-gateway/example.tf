@@ -81,6 +81,8 @@ module "rest_api" {
   rest_api_endpoint_type      = "REGIONAL"
   integration_uri             = module.lambda.invoke_arn
   rest_api_stage_name         = "test"
+
+
   api_resources = {
     users = {
       path_part   = "users"

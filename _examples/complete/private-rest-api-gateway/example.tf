@@ -182,7 +182,7 @@ module "rest_api_private" {
 
   # -- VPC Endpoint configuration
   vpc_id                      = module.vpc.vpc_id
-  service_name                = "com.amazonaws.ap-south-1.execute-api"
+  service_name                = "com.amazonaws.us-east-1.execute-api"
   vpc_endpoint_type           = "Interface"
   private_dns_enabled         = true
   subnet_ids                  = module.subnets.private_subnet_id
