@@ -94,9 +94,9 @@ module "subnets" {
     {
       rule_number = 100
       rule_action = "allow"
-      from_port   = "10.0.0.0/16"
-      to_port     = "10.0.0.0/16"
-      protocol    = "-1"
+      from_port   = "22"
+      to_port     = "22"
+      protocol    = "tcp"
       cidr_block  = module.vpc.vpc_cidr_block
     }
   ]
@@ -104,12 +104,33 @@ module "subnets" {
     {
       rule_number = 100
       rule_action = "allow"
-      from_port   = "10.0.0.0/16"
-      to_port     = "10.0.0.0/16"
-      protocol    = "-1"
+      from_port   = "22"
+      to_port     = "22"
+      protocol    = "tcp"
       cidr_block  = module.vpc.vpc_cidr_block
     }
   ]
+  public_outbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = "22"
+      to_port     = "22"
+      protocol    = "tcp"
+      cidr_block  = module.vpc.vpc_cidr_block
+    }
+  ]
+  public_inbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = "22"
+      to_port     = "22"
+      protocol    = "tcp"
+      cidr_block  = module.vpc.vpc_cidr_block
+    }
+  ]
+
 }
 
 module "security_group" {
@@ -132,13 +153,12 @@ module "security_group" {
   ]
   new_sg_egress_rules_with_cidr_blocks = [
     {
-      rule_count       = 1
-      from_port        = "10.0.0.0/16"
-      protocol         = "-1"
-      to_port          = "10.0.0.0/16"
-      cidr_blocks      = ["10.0.0.0/16"]
-      ipv6_cidr_blocks = ["::/0"]
-      description      = "Allow all outbound traffic."
+      rule_count  = 1
+      from_port   = "10.0.0.0/16"
+      protocol    = "-1"
+      to_port     = "10.0.0.0/16"
+      cidr_blocks = ["10.0.0.0/16"]
+      description = "Allow all outbound traffic."
     }
   ]
 }
