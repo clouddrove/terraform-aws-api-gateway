@@ -547,7 +547,7 @@ variable "stage_variables" {
 
 variable "aws_cloudwatch_log_group_arn" {
   type        = string
-  default     = null
+  default     = ""
   description = "ARN of the CloudWatch Logs log group or Kinesis Data Firehose delivery stream to receive access logs"
 }
 

@@ -2,7 +2,7 @@ locals {
   name        = "api"
   environment = "test"
   domain_name = "clouddrove.ca"
-  region      = "ap-south-1"
+  region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
 ## This terraform module is designed to generate consistent label names and tags for resources.
@@ -157,7 +157,7 @@ module "security_group" {
       from_port   = 0
       protocol    = "-1"
       to_port     = 0
-      cidr_blocks = ["10.0.0.0/16"]
+      cidr_blocks = [module.vpc.vpc_cidr_block]
       description = "Allow all outbound traffic."
     }
   ]

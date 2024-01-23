@@ -9,7 +9,7 @@ locals {
   name        = "api"
   environment = "test"
   domain_name = "clouddrove.ca"
-  region      = "eu-west-1"
+  region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
 ## This terraform module is designed to generate consistent label names and tags for resources.
