@@ -396,6 +396,11 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
     use_stage_cache          = var.use_stage_cache
   }
 
+  access_log_settings {
+    destination_arn = var.aws_cloudwatch_log_group_arn
+    format          = var.log_format
+  }
+
   tags = module.labels.tags
 }
 

@@ -313,7 +313,7 @@ variable "rest_api_policy" {
 
 variable "xray_tracing_enabled" {
   type        = bool
-  default     = false
+  default     = true
   description = "A flag to indicate whether to enable X-Ray tracing."
 }
 
@@ -547,7 +547,7 @@ variable "stage_variables" {
 
 variable "aws_cloudwatch_log_group_arn" {
   type        = string
-  default     = ""
+  default     = null
   description = "ARN of the CloudWatch Logs log group or Kinesis Data Firehose delivery stream to receive access logs"
 }
 
@@ -666,6 +666,12 @@ variable "rest_api_endpoint_policy" {
   type        = string
   default     = null
   description = "IAM policy document in JSON format"
+}
+
+variable "log_format" {
+  type        = string
+  default     = "json"
+  description = " Formatting and values recorded in the logs. For more information on configuring the log format rules visit the AWS documentation"
 }
 
 variable "rest_api_role" {
