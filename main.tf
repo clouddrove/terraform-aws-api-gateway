@@ -151,22 +151,36 @@ resource "aws_apigatewayv2_route" "default" {
   model_selection_expression          = try(each.value.model_selection_expression, null)
   operation_name                      = try(each.value.operation_name, null)
   route_response_selection_expression = try(each.value.route_response_selection_expression, null)
-  target                              = "integrations/${join("", aws_apigatewayv2_integration.default[*].id)}"
+  target                              = "integrations/${(aws_apigatewayv2_integration.default[each.key].id)}"
 }
 
 ##----------------------------------------------------------------------------------
 ## Below resource will Manages an Amazon API Gateway Version 2 integration.
 ##----------------------------------------------------------------------------------
-resource "aws_apigatewayv2_integration" "default" {
-  count = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? 1 : 0
+# resource "aws_apigatewayv2_integration" "default" {
+#   count = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? 1 : 0
 
-  api_id               = join("", aws_apigatewayv2_api.default[*].id)
-  integration_type     = var.integration_type
-  connection_type      = var.connection_type
-  description          = var.integration_description
-  integration_method   = var.integration_method
-  integration_uri      = var.integration_uri
-  passthrough_behavior = var.passthrough_behavior
+#   api_id               = join("", aws_apigatewayv2_api.default[*].id)
+#   integration_type     = var.integration_type
+#   connection_type      = var.connection_type
+#   description          = var.integration_description
+#   integration_method   = var.integration_method
+#   integration_uri      = var.integration_uri
+#   passthrough_behavior = var.passthrough_behavior
+#   payload_format_version = var.payload_version #"2.0"
+# }
+
+resource "aws_apigatewayv2_integration" "default" {
+  for_each = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? var.integrations : {}
+
+  api_id                 = join("", aws_apigatewayv2_api.default[*].id)
+  integration_type       = var.integration_type
+  connection_type        = var.connection_type
+  description            = var.integration_description
+  integration_method     = var.integration_method
+  integration_uri        = var.integration_uri
+  passthrough_behavior   = var.passthrough_behavior
+  payload_format_version = try(each.value.payload_format_version, null)
 }
 
 ##----------------------------------------------------------------------------------

@@ -37,6 +37,13 @@ variable "enabled" {
   description = "Flag to control the api creation."
 }
 
+variable "payload_version" {
+  type        = string
+  default     = ""
+  description = "(optional) describe your variable"
+}
+
+
 variable "create_http_api" {
   type        = bool
   default     = false
