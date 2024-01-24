@@ -8,7 +8,7 @@ provider "aws" {
 locals {
   name        = "api"
   environment = "test"
-  domain_name = "tech-tycoons.clouddrove.ca"
+  domain_name = "clouddrove.ca"
   region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
@@ -74,10 +74,10 @@ module "api_gateway" {
 
   name                        = local.name
   environment                 = local.environment
-  domain_name                 = "api.tech-tycoons.clouddrove.ca"
+  domain_name                 = "clouddrove.ca"
   domain_name_certificate_arn = module.acm.arn
   integration_uri             = module.lambda.invoke_arn
-  zone_id                     = "Z08295059QJZ2CJCU2HZ"
+  zone_id                     = "Z08295059QJZ2CJCxxxx"
   auto_deploy                 = true
   stage_name                  = "$default"
   create_vpc_link_enabled     = false
