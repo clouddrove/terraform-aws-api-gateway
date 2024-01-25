@@ -8,7 +8,7 @@ provider "aws" {
 locals {
   name        = "api"
   environment = "test"
-  domain_name = "tech-tycoons.clouddrove.ca"
+  domain_name = "clouddrove.ca"
   region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------

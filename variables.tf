@@ -501,7 +501,7 @@ variable "timeout_milliseconds" {
 variable "api_deployment_description" {
   type        = string
   default     = "test"
-  description = "(optional) describe your variable"
+  description = "flag to manage description of api deployment"
 }
 
 variable "stage_description" {
