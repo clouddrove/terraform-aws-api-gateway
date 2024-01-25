@@ -8,7 +8,7 @@ provider "aws" {
 locals {
   name        = "api"
   environment = "test"
-  domain_name = "clouddrove.ca"
+  domain_name = "tech-tycoons.clouddrove.ca"
   region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ module "api_gateway" {
   domain_name                 = "clouddrove.ca"
   domain_name_certificate_arn = module.acm.arn
   integration_uri             = module.lambda.invoke_arn
-  zone_id                     = "Z08295059QJZ2CJCxxxx"
+  zone_id                     = "Z08295059QJZ2CJxxxxx"
   auto_deploy                 = true
   stage_name                  = "$default"
   create_vpc_link_enabled     = false
@@ -100,7 +100,7 @@ module "api_gateway" {
     }
     "POST /start-step-function" = {
       lambda_arn             = module.lambda.arn
-      payload_format_version = "2.0"
+      payload_format_version = "1.0"
       authorizer_key         = "cognito"
     }
   }

@@ -157,18 +157,6 @@ resource "aws_apigatewayv2_route" "default" {
 ##----------------------------------------------------------------------------------
 ## Below resource will Manages an Amazon API Gateway Version 2 integration.
 ##----------------------------------------------------------------------------------
-# resource "aws_apigatewayv2_integration" "default" {
-#   count = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? 1 : 0
-
-#   api_id               = join("", aws_apigatewayv2_api.default[*].id)
-#   integration_type     = var.integration_type
-#   connection_type      = var.connection_type
-#   description          = var.integration_description
-#   integration_method   = var.integration_method
-#   integration_uri      = var.integration_uri
-#   passthrough_behavior = var.passthrough_behavior
-#   payload_format_version = var.payload_version #"2.0"
-# }
 
 resource "aws_apigatewayv2_integration" "default" {
   for_each = var.enabled && var.create_routes_and_integrations_enabled && var.create_http_api ? var.integrations : {}
@@ -251,7 +239,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
     vpc_endpoint_ids = var.rest_api_endpoint_type == "PRIVATE" ? [aws_vpc_endpoint.rest_api_private[0].id] : null
   }
 
-  policy = var.rest_api_endpoint_type != "PRIVATE" ? null : var.rest_api_endpoint_policy != "" ? var.rest_api_endpoint_policy : <<EOF
+  policy = var.rest_api_endpoint_type != "PRIVATE" ? null : <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -411,7 +399,7 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
   }
 
   access_log_settings {
-    destination_arn = var.aws_cloudwatch_log_group_arn
+    destination_arn = aws_cloudwatch_log_group.rest_api_log[0].arn
     format          = var.log_format
   }
 
@@ -490,6 +478,22 @@ resource "aws_iam_role" "rest_api_iam_role" {
 
 }
 
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon Rest API Cloudwatch Log Group.
+##----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "rest_api_log" {
+  count             = var.enabled && var.create_rest_api_Cloudwatch_log_group && var.create_rest_api ? 1 : 0
+  name              = module.labels.id
+  skip_destroy      = var.skip_destroy
+  log_group_class   = var.log_group_class
+  retention_in_days = var.retention_in_days
+  kms_key_id        = var.kms_key_id
+  tags              = module.labels.tags
+}
+
+
 ##-----------------------------------------------------------------------
 # REST API PRIVATE: This only requires VPC ENDPOINT and RESOURCE POLICY
 ##-----------------------------------------------------------------------
@@ -504,7 +508,6 @@ resource "aws_vpc_endpoint" "rest_api_private" {
   subnet_ids         = var.subnet_ids
   security_group_ids = var.security_group_ids
 }
-
 
 
 

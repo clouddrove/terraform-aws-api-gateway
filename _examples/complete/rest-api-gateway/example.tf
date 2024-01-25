@@ -70,6 +70,72 @@ module "lambda" {
 ####----------------------------------------------------------------------------------
 ## REST API
 ####----------------------------------------------------------------------------------
+
+module "kms_key" {
+  source              = "clouddrove/kms/aws"
+  version             = "1.3.1"
+  enabled             = true
+  name                = "${local.name}-kms"
+  environment         = local.environment
+  enable_key_rotation = true
+  alias               = "alias/rest-${local.name}-kms-keys"
+  multi_region        = true
+  policy              = data.aws_iam_policy_document.cloudwatch.json
+}
+
+
+
+data "aws_caller_identity" "current" {}
+
+data "aws_partition" "current" {}
+
+data "aws_region" "current" {}
+
+data "aws_iam_policy_document" "cloudwatch" {
+  policy_id = "key-policy-cloudwatch"
+  statement {
+    sid = "Enable IAM User Permissions"
+    actions = [
+      "kms:*",
+    ]
+    effect = "Allow"
+    principals {
+      type = "AWS"
+      identifiers = [
+        format(
+          "arn:%s:iam::%s:root",
+          data.aws_partition.current.partition,
+          data.aws_caller_identity.current.account_id
+        )
+      ]
+    }
+    resources = ["*"]
+  }
+  statement {
+    sid = "AllowCloudWatchLogs"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    effect = "Allow"
+    principals {
+      type = "Service"
+      identifiers = [
+        format(
+          "logs.%s.amazonaws.com",
+          data.aws_region.current.name
+        )
+      ]
+    }
+    resources = ["*"]
+  }
+}
+
+
+
 module "rest_api" {
   source = "../../../"
 
@@ -97,9 +163,16 @@ module "rest_api" {
     }
   }
 
+  # --- cloudwatch log group
+  kms_key_id        = module.kms_key.key_arn
+  skip_destroy      = false
+  log_group_class   = "STANDARD"
+  retention_in_days = 7
+
+
   # -- Required
-  domain_name   = "api.${local.domain_name}"
-  zone_id       = "Z01564602K369XB8xxxxx"
+  domain_name   = local.domain_name
+  zone_id       = "Z08295059QJZ2CJCxxxx"
   rest_api_role = <<EOF
 {
   "Version": "2012-10-17",
