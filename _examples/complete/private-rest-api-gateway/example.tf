@@ -1,8 +1,13 @@
+####----------------------------------------------------------------------------------
+## PROVIDER
+####----------------------------------------------------------------------------------
 
 provider "aws" {
   region = local.region
 }
-
+####----------------------------------------------------------------------------------
+## LOCALS
+####----------------------------------------------------------------------------------
 
 locals {
   name        = "api"
@@ -11,8 +16,9 @@ locals {
   region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
-## This terraform module is designed to generate consistent label names and tags for resources.
+## ACM
 ####----------------------------------------------------------------------------------
+
 module "acm" {
   source  = "clouddrove/acm/aws"
   version = "1.4.1"
@@ -27,8 +33,9 @@ module "acm" {
 }
 
 ####----------------------------------------------------------------------------------
-## This terraform module is designed to generate consistent label names and tags for resources.
+## LAMBDA
 ####----------------------------------------------------------------------------------
+
 module "lambda" {
   source  = "clouddrove/lambda/aws"
   version = "1.3.1"
@@ -67,8 +74,9 @@ module "lambda" {
 
 
 ####----------------------------------------------------------------------------------
-## REST API PRIVATE
+## VPC
 ####----------------------------------------------------------------------------------
+
 module "vpc" {
   source  = "clouddrove/vpc/aws"
   version = "2.0.0"
@@ -79,6 +87,10 @@ module "vpc" {
   cidr_block  = "10.0.0.0/16"
 
 }
+
+####----------------------------------------------------------------------------------
+## SUBNETS
+####----------------------------------------------------------------------------------
 
 module "subnets" {
   source  = "clouddrove/subnet/aws"
@@ -139,6 +151,10 @@ module "subnets" {
 
 }
 
+####----------------------------------------------------------------------------------
+## SECURITY GROUP
+####----------------------------------------------------------------------------------
+
 module "security_group" {
   source  = "clouddrove/security-group/aws"
   version = "2.0.0"
@@ -170,25 +186,16 @@ module "security_group" {
 }
 
 
-module "kms_key" {
-  source              = "clouddrove/kms/aws"
-  version             = "1.3.1"
-  enabled             = true
-  name                = "${local.name}-kms"
-  environment         = local.environment
-  enable_key_rotation = true
-  alias               = "alias/rest-${local.name}-kms-keys"
-  multi_region        = true
-  policy              = data.aws_iam_policy_document.cloudwatch.json
-}
-
+####----------------------------------------------------------------------------------
+## REST API PRIVATE
+####----------------------------------------------------------------------------------
 
 module "rest_api_private" {
   source = "../../../"
 
-  name        = "${local.name}-rest-api-private"
-  environment = local.environment
-
+  name                   = "${local.name}-rest-api-private"
+  environment            = local.environment
+  enabled                = true
   create_rest_api        = true
   rest_api_endpoint_type = "PRIVATE"
   rest_api_description   = "Private REST API for ${module.lambda.name} lambda function"
@@ -198,7 +205,7 @@ module "rest_api_private" {
   rest_api_base_path     = "test"
   # -- Required
   domain_name = local.domain_name
-  zone_id     = "Z08295059QJZ2CJCxxxx"
+  zone_id     = "Z0156xxxxxxxxxxxxxx"
 
   # -- VPC Endpoint configuration
   vpc_id                      = module.vpc.vpc_id
@@ -209,59 +216,11 @@ module "rest_api_private" {
   security_group_ids          = [module.security_group.security_group_id]
   domain_name_certificate_arn = module.acm.arn
 
-  # --- cloudwatch log group
-  kms_key_id        = module.kms_key.key_arn
-  skip_destroy      = true
-  log_group_class   = "STANDARD"
-  retention_in_days = 7
+
+  #---access log----
+
+  enable_access_logs = true
+  retention_in_days  = 7
 }
 
 
-data "aws_caller_identity" "current" {}
-
-data "aws_partition" "current" {}
-
-data "aws_region" "current" {}
-
-data "aws_iam_policy_document" "cloudwatch" {
-  policy_id = "key-policy-cloudwatch"
-  statement {
-    sid = "Enable IAM User Permissions"
-    actions = [
-      "kms:*",
-    ]
-    effect = "Allow"
-    principals {
-      type = "AWS"
-      identifiers = [
-        format(
-          "arn:%s:iam::%s:root",
-          data.aws_partition.current.partition,
-          data.aws_caller_identity.current.account_id
-        )
-      ]
-    }
-    resources = ["*"]
-  }
-  statement {
-    sid = "AllowCloudWatchLogs"
-    actions = [
-      "kms:Encrypt*",
-      "kms:Decrypt*",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:Describe*"
-    ]
-    effect = "Allow"
-    principals {
-      type = "Service"
-      identifiers = [
-        format(
-          "logs.%s.amazonaws.com",
-          data.aws_region.current.name
-        )
-      ]
-    }
-    resources = ["*"]
-  }
-}

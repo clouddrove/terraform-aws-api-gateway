@@ -1,9 +1,13 @@
 ####----------------------------------------------------------------------------------
-## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
+## PROVIDER
 ####----------------------------------------------------------------------------------
 provider "aws" {
   region = local.region
 }
+
+####----------------------------------------------------------------------------------
+## LOCALS
+####----------------------------------------------------------------------------------
 
 locals {
   name        = "api"
@@ -12,7 +16,7 @@ locals {
   region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
-## This terraform module is designed to generate consistent label names and tags for resources.
+## ACM
 ####----------------------------------------------------------------------------------
 module "acm" {
   source  = "clouddrove/acm/aws"
@@ -28,7 +32,7 @@ module "acm" {
 }
 
 ####----------------------------------------------------------------------------------
-## This terraform module is designed to generate consistent label names and tags for resources.
+## LAMBDA
 ####----------------------------------------------------------------------------------
 module "lambda" {
   source  = "clouddrove/lambda/aws"
@@ -71,71 +75,6 @@ module "lambda" {
 ## REST API
 ####----------------------------------------------------------------------------------
 
-module "kms_key" {
-  source              = "clouddrove/kms/aws"
-  version             = "1.3.1"
-  enabled             = true
-  name                = "${local.name}-kms"
-  environment         = local.environment
-  enable_key_rotation = true
-  alias               = "alias/rest-${local.name}-kms-keys"
-  multi_region        = true
-  policy              = data.aws_iam_policy_document.cloudwatch.json
-}
-
-
-
-data "aws_caller_identity" "current" {}
-
-data "aws_partition" "current" {}
-
-data "aws_region" "current" {}
-
-data "aws_iam_policy_document" "cloudwatch" {
-  policy_id = "key-policy-cloudwatch"
-  statement {
-    sid = "Enable IAM User Permissions"
-    actions = [
-      "kms:*",
-    ]
-    effect = "Allow"
-    principals {
-      type = "AWS"
-      identifiers = [
-        format(
-          "arn:%s:iam::%s:root",
-          data.aws_partition.current.partition,
-          data.aws_caller_identity.current.account_id
-        )
-      ]
-    }
-    resources = ["*"]
-  }
-  statement {
-    sid = "AllowCloudWatchLogs"
-    actions = [
-      "kms:Encrypt*",
-      "kms:Decrypt*",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:Describe*"
-    ]
-    effect = "Allow"
-    principals {
-      type = "Service"
-      identifiers = [
-        format(
-          "logs.%s.amazonaws.com",
-          data.aws_region.current.name
-        )
-      ]
-    }
-    resources = ["*"]
-  }
-}
-
-
-
 module "rest_api" {
   source = "../../../"
 
@@ -146,9 +85,7 @@ module "rest_api" {
   rest_api_description        = "REST API for ${module.lambda.name} lambda function"
   rest_api_endpoint_type      = "REGIONAL"
   integration_uri             = module.lambda.invoke_arn
-  rest_api_stage_name         = "test"
-
-
+  rest_api_stage_name         = "default"
   api_resources = {
     users = {
       path_part   = "users"
@@ -163,16 +100,15 @@ module "rest_api" {
     }
   }
 
-  # --- cloudwatch log group
-  kms_key_id        = module.kms_key.key_arn
-  skip_destroy      = false
-  log_group_class   = "STANDARD"
-  retention_in_days = 7
+  #---access log----
+
+  enable_access_logs = true
+  retention_in_days  = 7
 
 
   # -- Required
   domain_name   = local.domain_name
-  zone_id       = "Z08295059QJZ2CJCxxxx"
+  zone_id       = "Z015646xxxxxxxxxxx"
   rest_api_role = <<EOF
 {
   "Version": "2012-10-17",
@@ -189,5 +125,9 @@ module "rest_api" {
 }
 EOF
 }
+
+
+
+
 
 

@@ -392,19 +392,29 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
     create_before_destroy = true
   }
 
-  canary_settings {
-    percent_traffic          = var.percent_traffic
-    stage_variable_overrides = var.stage_variable_overrides
-    use_stage_cache          = var.use_stage_cache
+  dynamic "canary_settings" {
+    for_each = var.canary_settings
+    content {
+      percent_traffic          = canary_settings.percent_traffic.value          #var.percent_traffic
+      stage_variable_overrides = canary_settings.stage_variable_overrides.value #var.stage_variable_overrides
+      use_stage_cache          = canary_settings.use_stage_cache.value          #var.use_stage_cache
+
+    }
   }
 
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.rest_api_log[0].arn
-    format          = var.log_format
+  dynamic "access_log_settings" {
+    for_each = var.enable_access_logs == true ? [1] : []
+
+    content {
+      destination_arn = aws_cloudwatch_log_group.rest_api_log[0].arn
+      format          = replace(var.log_format, "\n", "")
+    }
   }
 
   tags = module.labels.tags
 }
+
+
 
 ##----------------------------------------------------------------------------------
 ## Below resource will Manages an Amazon REST API Gateway Method Response.
@@ -484,15 +494,82 @@ resource "aws_iam_role" "rest_api_iam_role" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_log_group" "rest_api_log" {
-  count             = var.enabled && var.create_rest_api_Cloudwatch_log_group && var.create_rest_api ? 1 : 0
+  count             = var.enabled && var.enable_access_logs && var.create_rest_api ? 1 : 0
   name              = module.labels.id
   skip_destroy      = var.skip_destroy
   log_group_class   = var.log_group_class
   retention_in_days = var.retention_in_days
-  kms_key_id        = var.kms_key_id
+  kms_key_id        = var.create_kms_key == true ? module.kms_key.key_arn : var.my_kms_key
   tags              = module.labels.tags
 }
 
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Amazon Rest API Kms Key.
+##----------------------------------------------------------------------------------
+
+module "kms_key" {
+
+  source              = "clouddrove/kms/aws"
+  enabled             = var.enabled && var.enable_access_logs && var.create_kms_key ? true : false
+  name                = module.labels.id
+  enable_key_rotation = var.enable_key_rotation
+  multi_region        = var.multi_region
+  policy              = data.aws_iam_policy_document.cloudwatch[0].json
+}
+
+##----------------------------------------------------------------------------------
+## Below resource will Manages an Kms key JSON POlicy.
+##----------------------------------------------------------------------------------
+
+data "aws_caller_identity" "current" {}
+
+data "aws_partition" "current" {}
+
+data "aws_region" "current" {}
+
+data "aws_iam_policy_document" "cloudwatch" {
+  count     = var.enable_access_logs && var.enabled ? 1 : 0
+  policy_id = "key-policy-cloudwatch"
+  statement {
+    sid = "Enable IAM User Permissions"
+    actions = [
+      "kms:*",
+    ]
+    effect = "Allow"
+    principals {
+      type = "AWS"
+      identifiers = [
+        format(
+          "arn:%s:iam::%s:root",
+          data.aws_partition.current.partition,
+          data.aws_caller_identity.current.account_id
+        )
+      ]
+    }
+    resources = ["*"]
+  }
+  statement {
+    sid = "AllowCloudWatchLogs"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    effect = "Allow"
+    principals {
+      type = "Service"
+      identifiers = [
+        format(
+          "logs.%s.amazonaws.com",
+          data.aws_region.current.name
+        )
+      ]
+    }
+    resources = ["*"]
+  }
+}
 
 ##-----------------------------------------------------------------------
 # REST API PRIVATE: This only requires VPC ENDPOINT and RESOURCE POLICY

@@ -558,23 +558,15 @@ variable "apigw_cloudwatch_logs_format" {
   description = "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#apigateway-cloudwatch-log-formats"
 }
 
-variable "percent_traffic" {
-  type        = number
-  default     = null
-  description = "Percent 0.0 - 100.0 of traffic to divert to the canary deployment."
-}
 
-variable "stage_variable_overrides" {
+
+variable "canary_settings" {
   type        = map(any)
   default     = {}
-  description = "Map of overridden stage variables (including new variables) for the canary deployment."
+  description = "(optional) describe your variable"
 }
 
-variable "use_stage_cache" {
-  type        = bool
-  default     = false
-  description = " Whether the canary deployment uses the stage cache. Defaults to false."
-}
+
 
 variable "rest_api_stage_name" {
   type        = string
@@ -669,10 +661,35 @@ variable "rest_api_endpoint_policy" {
   description = "IAM policy document in JSON format"
 }
 
+
 variable "log_format" {
-  type        = string
-  default     = "$context.requestId"
   description = " Formatting and values recorded in the logs. For more information on configuring the log format rules visit the AWS documentation"
+  type        = string
+  default     = <<EOF
+  {
+	"requestTime": "$context.requestTime",
+	"requestId": "$context.requestId",
+	"httpMethod": "$context.httpMethod",
+	"path": "$context.path",
+	"resourcePath": "$context.resourcePath",
+	"status": $context.status,
+	"responseLatency": $context.responseLatency,
+  "xrayTraceId": "$context.xrayTraceId",
+  "integrationRequestId": "$context.integration.requestId",
+	"functionResponseStatus": "$context.integration.status",
+  "integrationLatency": "$context.integration.latency",
+	"integrationServiceStatus": "$context.integration.integrationStatus",
+  "authorizeResultStatus": "$context.authorize.status",
+	"authorizerServiceStatus": "$context.authorizer.status",
+	"authorizerLatency": "$context.authorizer.latency",
+	"authorizerRequestId": "$context.authorizer.requestId",
+  "ip": "$context.identity.sourceIp",
+	"userAgent": "$context.identity.userAgent",
+	"principalId": "$context.authorizer.principalId",
+	"cognitoUser": "$context.identity.cognitoIdentityId",
+  "user": "$context.identity.user"
+}
+  EOF
 }
 
 
@@ -691,21 +708,69 @@ variable "retention_in_days" {
 
 variable "log_group_class" {
   type        = string
-  default     = ""
+  default     = "STANDARD"
   description = " Specified the log class of the log group. Possible values are: STANDARD or INFREQUENT_ACCESS."
 }
 
 variable "skip_destroy" {
   type        = bool
-  default     = false
+  default     = null
   description = "Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state."
 }
 
 
-variable "create_rest_api_Cloudwatch_log_group" {
+variable "enable_access_logs" {
   type        = bool
   default     = true
   description = "flag to manage of cloudwatch log group creation"
+}
+
+variable "my_kms_key" {
+  type        = string
+  default     = ""
+  description = "flag to manage of kms key by user"
+}
+
+variable "kms_key_arn" {
+  type        = string
+  default     = ""
+  description = "flag to manage of kms key ARN"
+}
+
+variable "kms_key_name" {
+  type        = string
+  default     = ""
+  description = " The display name of the alias. The name must start with the word alias followed by a forward slash (alias/)"
+}
+
+variable "kms_key_environment" {
+  type        = string
+  default     = ""
+  description = "flag to manage of kms key environment"
+}
+
+variable "enable_key_rotation" {
+  type        = bool
+  default     = null
+  description = "Specifies whether key rotation is enabled. Defaults to false."
+}
+
+variable "create_kms_key" {
+  type        = bool
+  default     = true
+  description = "flag to manage of kms key creation"
+}
+
+variable "alias" {
+  type        = string
+  default     = ""
+  description = "flag to manage of kms keys alias name"
+}
+
+variable "multi_region" {
+  type        = bool
+  default     = false
+  description = "ndicates whether the KMS key is a multi-Region (true) or regional (false) key. Defaults to false."
 }
 
 variable "rest_api_role" {

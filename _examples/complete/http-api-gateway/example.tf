@@ -1,9 +1,13 @@
 ####----------------------------------------------------------------------------------
-## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
+## PROVIDER
 ####----------------------------------------------------------------------------------
 provider "aws" {
   region = local.region
 }
+
+####----------------------------------------------------------------------------------
+## LOCALS
+####----------------------------------------------------------------------------------
 
 locals {
   name        = "api"
@@ -12,7 +16,7 @@ locals {
   region      = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
-## This terraform module is designed to generate consistent label names and tags for resources.
+## ACM
 ####----------------------------------------------------------------------------------
 module "acm" {
   source  = "clouddrove/acm/aws"
@@ -28,7 +32,7 @@ module "acm" {
 }
 
 ####----------------------------------------------------------------------------------
-## This terraform module is designed to generate consistent label names and tags for resources.
+## LAMBDA
 ####----------------------------------------------------------------------------------
 module "lambda" {
   source  = "clouddrove/lambda/aws"
@@ -67,7 +71,7 @@ module "lambda" {
 }
 
 ####----------------------------------------------------------------------------------
-## This terraform module is designed to generate consistent label names and tags for resources.
+## API GATEWAY
 ####----------------------------------------------------------------------------------
 module "api_gateway" {
   source = "../../../"
@@ -77,7 +81,7 @@ module "api_gateway" {
   domain_name                 = "clouddrove.ca"
   domain_name_certificate_arn = module.acm.arn
   integration_uri             = module.lambda.invoke_arn
-  zone_id                     = "Z08295059QJZ2CJxxxxx"
+  zone_id                     = "Z082xxxxxxxxxxx"
   auto_deploy                 = true
   stage_name                  = "$default"
   create_vpc_link_enabled     = false
