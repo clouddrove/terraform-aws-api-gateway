@@ -10,10 +10,11 @@ provider "aws" {
 ####----------------------------------------------------------------------------------
 
 locals {
-  name        = "api"
-  environment = "test"
-  domain_name = "clouddrove.ca"
-  region      = "us-east-1"
+  name           = "api"
+  environment    = "test"
+  region         = "us-east-1"
+  domain_name    = "clouddrove.ca"
+  hosted_zone_id = "Z015XXXXXXXXXXXXXXIEP"
 }
 ####----------------------------------------------------------------------------------
 ## ACM
@@ -78,10 +79,10 @@ module "api_gateway" {
 
   name                        = local.name
   environment                 = local.environment
-  domain_name                 = "clouddrove.ca"
+  domain_name                 = "api.${local.domain_name}"
   domain_name_certificate_arn = module.acm.arn
   integration_uri             = module.lambda.invoke_arn
-  zone_id                     = "Z082xxxxxxxxxxx"
+  zone_id                     = local.hosted_zone_id
   auto_deploy                 = true
   stage_name                  = "$default"
   create_vpc_link_enabled     = false

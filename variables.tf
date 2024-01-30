@@ -1,7 +1,7 @@
 variable "name" {
   type        = string
-  default     = "api"
-  description = "Name  (e.g. `app` or `cluster`)."
+  default     = ""
+  description = "Name  (e.g. `app` or `api`)."
 }
 
 variable "environment" {
@@ -28,26 +28,20 @@ variable "managedby" {
   description = "ManagedBy, eg 'CloudDrove'"
 }
 
-##---------------------------------------------------------------------------------
-# HTTP API
-##---------------------------------------------------------------------------------
 variable "enabled" {
   type        = bool
   default     = true
-  description = "Flag to control the api creation."
+  description = "Set this to `false` to prevent resource creation by this terraform module."
 }
 
+##---------------------------------------------------------------------------------
+## HTTP API
+##---------------------------------------------------------------------------------
 
 variable "create_http_api" {
   type        = bool
   default     = false
   description = "Flag to control creation of HTTP api."
-}
-
-variable "create_api_gateway_enabled" {
-  type        = bool
-  default     = true
-  description = "Flag to control the api creation."
 }
 
 variable "api_description" {
@@ -290,26 +284,19 @@ variable "auto_deploy" {
 }
 
 ##---------------------------------------------------------------------------------------
-# REST API
+## REST API
 ##---------------------------------------------------------------------------------------
 
-variable "create_rest_api_gateway" {
+variable "create_rest_api" {
   type        = bool
-  default     = true
-  description = "Flag to control the rest api gateway creation"
+  default     = false
+  description = "Flag to control the rest api creation."
 }
 
 variable "rest_api_endpoint_type" {
   type        = string
   default     = null
-  description = "The type of the endpoint. One of - PUBLIC, PRIVATE, REGIONAL"
-}
-
-
-variable "rest_api_policy" {
-  type        = string
-  default     = ""
-  description = "The IAM policy document for the API."
+  description = "(Required) List of endpoint types. This resource currently only supports managing a single value. Valid values: EDGE, REGIONAL or PRIVATE. If unspecified, defaults to EDGE."
 }
 
 variable "xray_tracing_enabled" {
@@ -318,40 +305,16 @@ variable "xray_tracing_enabled" {
   description = "A flag to indicate whether to enable X-Ray tracing."
 }
 
-variable "metrics_enabled" {
-  type        = bool
-  default     = false
-  description = "A flag to indicate whether to enable metrics collection."
-}
-
-variable "logging_level" {
-  type        = string
-  default     = "INFO"
-  description = "The logging level of the API. One of - OFF, INFO, ERROR"
-}
-
-variable "data_trace_enabled" {
-  type        = bool
-  default     = false
-  description = "Specifies whether data trace logging is enabled for this method, which effects the log entries pushed to Amazon CloudWatch Logs."
-}
-
-variable "vpc_endpoint_ids" {
+variable "vpc_endpoint_id" {
   type        = string
   default     = ""
-  description = "The type of the endpoint. One of - PUBLIC, PRIVATE, REGIONAL"
+  description = "ID of the vpc endpoint. Only applicable when "
 }
 
 variable "create_rest_api_deployment" {
   type        = bool
   default     = true
   description = "Flag to control the mapping creation."
-}
-
-variable "create_rest_api" {
-  type        = bool
-  default     = false
-  description = "Flag to control the rest api creation."
 }
 
 variable "create_rest_api_gateway_method" {
@@ -546,27 +509,11 @@ variable "stage_variables" {
   description = "Map that defines the stage variables"
 }
 
-variable "aws_cloudwatch_log_group_arn" {
-  type        = string
-  default     = ""
-  description = "ARN of the CloudWatch Logs log group or Kinesis Data Firehose delivery stream to receive access logs"
-}
-
-variable "apigw_cloudwatch_logs_format" {
-  type        = string
-  default     = ""
-  description = "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#apigateway-cloudwatch-log-formats"
-}
-
-
-
 variable "canary_settings" {
   type        = map(any)
   default     = {}
   description = "(optional) describe your variable"
 }
-
-
 
 variable "rest_api_stage_name" {
   type        = string
@@ -618,24 +565,11 @@ variable "provider_arns" {
   description = "required for type COGNITO_USER_POOLS) List of the Amazon Cognito user pool ARNs. Each element is of this format: arn:aws:cognito-idp:{region}:{account_id}:userpool/{user_pool_id}."
 }
 
-variable "api_gateway_rest_api_vpc_endpoint_ids" {
-  type        = list(string)
-  default     = []
-  description = "flag to control of rest api vpc endpoints ids"
-}
-
-variable "authorizer_credentials" {
-  type        = string
-  default     = ""
-  description = "Credentials required for the authorizer. To specify an IAM Role for API Gateway to assume, use the IAM Role ARN."
-}
-
 variable "authorizer_iam_role" {
   type        = string
   default     = ""
   description = " Custome IAMRole for Authorizer Credentials."
 }
-
 
 variable "rest_api_assume_role_policy" {
   type        = string
@@ -646,7 +580,7 @@ variable "rest_api_assume_role_policy" {
 variable "rest_api_base_path" {
   type        = string
   default     = ""
-  description = " Path segment that must be prepended to the path when accessing the API via this mapping. If omitted, the API is exposed at the root of the given domain."
+  description = "Path segment that must be prepended to the path when accessing the API via this mapping. If omitted, the API is exposed at the root of the given domain."
 }
 
 variable "api_resources" {
@@ -654,13 +588,6 @@ variable "api_resources" {
   default     = {}
   description = "flag to control of resources path"
 }
-
-variable "rest_api_endpoint_policy" {
-  type        = string
-  default     = null
-  description = "IAM policy document in JSON format"
-}
-
 
 variable "log_format" {
   description = " Formatting and values recorded in the logs. For more information on configuring the log format rules visit the AWS documentation"
@@ -692,14 +619,6 @@ variable "log_format" {
   EOF
 }
 
-
-variable "kms_key_id" {
-  type    = string
-  default = ""
-
-  description = "The ARN of the KMS Key to use when encrypting log data. Please note, after the AWS KMS CMK is disassociated from the log group, AWS CloudWatch Logs stops encrypting newly ingested data for the log group. All previously ingested data remains encrypted, and AWS CloudWatch Logs requires permissions for the CMK whenever the encrypted data is requested."
-}
-
 variable "retention_in_days" {
   type        = number
   default     = null
@@ -718,35 +637,16 @@ variable "skip_destroy" {
   description = "Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state."
 }
 
-
 variable "enable_access_logs" {
   type        = bool
   default     = true
   description = "flag to manage of cloudwatch log group creation"
 }
 
-variable "my_kms_key" {
-  type        = string
-  default     = ""
-  description = "flag to manage of kms key by user"
-}
-
 variable "kms_key_arn" {
   type        = string
   default     = ""
-  description = "flag to manage of kms key ARN"
-}
-
-variable "kms_key_name" {
-  type        = string
-  default     = ""
-  description = " The display name of the alias. The name must start with the word alias followed by a forward slash (alias/)"
-}
-
-variable "kms_key_environment" {
-  type        = string
-  default     = ""
-  description = "flag to manage of kms key environment"
+  description = "Pass existing KMS key arn. Only applicable when `create_kms_key` is set to false."
 }
 
 variable "enable_key_rotation" {
@@ -758,13 +658,7 @@ variable "enable_key_rotation" {
 variable "create_kms_key" {
   type        = bool
   default     = true
-  description = "flag to manage of kms key creation"
-}
-
-variable "alias" {
-  type        = string
-  default     = ""
-  description = "flag to manage of kms keys alias name"
+  description = "Set this to `false` to provide existing kms key arn in `kms_key_arn` variable."
 }
 
 variable "multi_region" {
@@ -773,33 +667,15 @@ variable "multi_region" {
   description = "ndicates whether the KMS key is a multi-Region (true) or regional (false) key. Defaults to false."
 }
 
-variable "rest_api_role" {
-  type        = string
-  default     = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-  description = "IAM policy document in JSON format"
-}
-
 ##-----------------------------------------------------------------------
-# REST API PRIVATE: This only requires VPC ENDPOINT and RESOURCE POLICY
+## VPC ENDPOINT
 ##-----------------------------------------------------------------------
 
-##-----------------------------------------------------------------------
-# REST API PRIVATE: This only requires VPC ENDPOINT and RESOURCE POLICY
-##-----------------------------------------------------------------------
+variable "create_vpc_endpoint" {
+  type        = bool
+  default     = true
+  description = "VPC endpoint is required to access api gateway url from outside the vpc. Set this to `false` to prevent vpc endpoint creation."
+}
 
 variable "vpc_id" {
   type        = string
@@ -809,7 +685,7 @@ variable "vpc_id" {
 
 variable "service_name" {
   type        = string
-  default     = "com.amazonaws.eu-west-1.execute-api"
+  default     = ""
   description = "The service name. For AWS services the service name is usually in the form com.amazonaws.<region>.<service> (the SageMaker Notebook service is an exception to this rule, the service name is in the form aws.sagemaker.<region>.notebook)."
 }
 
@@ -825,12 +701,8 @@ variable "private_dns_enabled" {
   description = "AWS services and AWS Marketplace partner services only) Whether or not to associate a private hosted zone with the specified VPC. Applicable for endpoints of type Interface. Most users will want this enabled to allow services within the VPC to automatically use the endpoint. Defaults to false."
 }
 
-variable "rest_api_private_vpc_endpoint_id" {
+variable "rest_api_resource_policy" {
   type        = string
   default     = ""
-  description = "ID of the VPC endpoint for the private REST API"
+  description = "(Optional) custom resource policy for private rest api."
 }
-
-
-
-

@@ -10,10 +10,11 @@ provider "aws" {
 ####----------------------------------------------------------------------------------
 
 locals {
-  name        = "api"
-  environment = "test"
-  domain_name = "clouddrove.ca"
-  region      = "us-east-1"
+  name           = "api"
+  environment    = "test"
+  region         = "us-east-1"
+  domain_name    = "clouddrove.ca"
+  hosted_zone_id = "Z015XXXXXXXXXXXXXXIEP"
 }
 ####----------------------------------------------------------------------------------
 ## ACM
@@ -114,7 +115,7 @@ module "subnets" {
       rule_action = "allow"
       from_port   = 0
       to_port     = 0
-      protocol    = "tcp"
+      protocol    = "-1"
       cidr_block  = module.vpc.vpc_cidr_block
     }
   ]
@@ -124,17 +125,7 @@ module "subnets" {
       rule_action = "allow"
       from_port   = 0
       to_port     = 0
-      protocol    = "tcp"
-      cidr_block  = module.vpc.vpc_cidr_block
-    }
-  ]
-  public_outbound_acl_rules = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "tcp"
+      protocol    = "-1"
       cidr_block  = module.vpc.vpc_cidr_block
     }
   ]
@@ -144,8 +135,18 @@ module "subnets" {
       rule_action = "allow"
       from_port   = 0
       to_port     = 0
-      protocol    = "tcp"
-      cidr_block  = module.vpc.vpc_cidr_block
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    }
+  ]
+  public_outbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
     }
   ]
 
@@ -200,25 +201,22 @@ module "rest_api_private" {
   rest_api_endpoint_type = "PRIVATE"
   rest_api_description   = "Private REST API for ${module.lambda.name} lambda function"
   integration_uri        = module.lambda.invoke_arn
-  rest_api_stage_name    = "tests"
+  rest_api_stage_name    = "default"
   auto_deploy            = true
   rest_api_base_path     = "test"
-  # -- Required
-  domain_name = local.domain_name
-  zone_id     = "Z0156xxxxxxxxxxxxxx"
+  domain_name            = "api.${local.domain_name}"
+  zone_id                = local.hosted_zone_id
 
   # -- VPC Endpoint configuration
   vpc_id                      = module.vpc.vpc_id
-  service_name                = "com.amazonaws.us-east-1.execute-api"
-  vpc_endpoint_type           = "Interface"
-  private_dns_enabled         = true
   subnet_ids                  = module.subnets.private_subnet_id
   security_group_ids          = [module.security_group.security_group_id]
+  service_name                = "com.amazonaws.${local.region}.execute-api"
+  vpc_endpoint_type           = "Interface"
+  private_dns_enabled         = true
   domain_name_certificate_arn = module.acm.arn
 
-
   #---access log----
-
   enable_access_logs = true
   retention_in_days  = 7
 }

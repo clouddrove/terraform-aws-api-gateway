@@ -1,5 +1,5 @@
 ##-------------------------------------------------------------
-# HTTP / WEBSOCKET
+## HTTP / WEBSOCKET
 ##-------------------------------------------------------------
 output "api_id" {
   value       = join("", aws_apigatewayv2_api.default[*].id)
@@ -22,7 +22,7 @@ output "invoke_url" {
 }
 
 ##-------------------------------------------------------------
-# REST API
+## REST API
 ##-------------------------------------------------------------
 output "rest_api_id" {
   value       = aws_api_gateway_rest_api.rest_api[*].id
@@ -39,4 +39,7 @@ output "rest_api_invoke_url" {
   description = "The URL to invoke the API pointing to the stage"
 }
 
-
+output "rest_api_execution_arn" {
+  value       = join("", aws_api_gateway_rest_api.rest_api[*].execution_arn)
+  description = "Execution arn of rest api gateway."
+}

@@ -16,9 +16,9 @@ module "labels" {
 ## Below resource will Manages an Amazon API Gateway Version 2 API.
 ##----------------------------------------------------------------------------------
 resource "aws_apigatewayv2_api" "default" {
-  count = var.enabled && var.create_api_gateway_enabled && var.create_http_api ? 1 : 0
+  count = var.enabled && var.create_http_api ? 1 : 0
 
-  name                         = format("%s", module.labels.id)
+  name                         = module.labels.id
   description                  = var.api_description
   protocol_type                = var.protocol_type
   version                      = var.api_version
@@ -55,6 +55,7 @@ resource "aws_apigatewayv2_domain_name" "default" {
     endpoint_type                          = "REGIONAL"
     security_policy                        = "TLS_1_2"
   }
+
   dynamic "mutual_tls_authentication" {
     for_each = var.mutual_tls_authentication
     content {
@@ -62,6 +63,7 @@ resource "aws_apigatewayv2_domain_name" "default" {
       truststore_version = lookup(mutual_tls_authentication.value.truststore_version, null)
     }
   }
+
   tags = module.labels.tags
 }
 
@@ -69,7 +71,7 @@ resource "aws_apigatewayv2_domain_name" "default" {
 ## Below Provides a Route53 record resource.
 ##----------------------------------------------------------------------------------
 resource "aws_route53_record" "default" {
-  count = var.enabled && (var.create_http_api || var.create_rest_api) ? 1 : 0
+  count = var.enabled && (var.create_http_api || var.create_rest_api) && var.rest_api_endpoint_type != "PRIVATE" ? 1 : 0
 
   name    = join("", aws_apigatewayv2_domain_name.default[*].domain_name)
   type    = "A"
@@ -91,6 +93,7 @@ resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.default[0].id
   name        = var.stage_name != null ? var.stage_name : format("%s-stage", module.labels.id)
   auto_deploy = var.auto_deploy
+
   dynamic "access_log_settings" {
     for_each = var.access_log_settings
     content {
@@ -98,6 +101,7 @@ resource "aws_apigatewayv2_stage" "default" {
       format          = var.default_stage_access_log_format
     }
   }
+
   dynamic "default_route_settings" {
     for_each = var.default_route_settings
 
@@ -110,6 +114,7 @@ resource "aws_apigatewayv2_stage" "default" {
       throttling_rate_limit    = lookup(default_route_settings.value.throttling_rate_limit, null)
     }
   }
+
   dynamic "route_settings" {
     for_each = var.route_settings
     content {
@@ -121,6 +126,7 @@ resource "aws_apigatewayv2_stage" "default" {
       throttling_rate_limit    = lookup(route_settings.value, "throttling_rate_limit", null)
     }
   }
+
   tags = module.labels.tags
 }
 
@@ -228,18 +234,26 @@ resource "aws_cognito_user_pool" "default" {
 ## Below resource will Provides a REST API resource.
 ##----------------------------------------------------------------------------------
 resource "aws_api_gateway_rest_api" "rest_api" {
-  count = var.enabled && var.create_rest_api_gateway && var.create_rest_api ? 1 : 0
+  count = var.enabled && var.create_rest_api ? 1 : 0
 
-  name        = format("%s", module.labels.id)
+  name        = module.labels.id
   description = var.rest_api_description
   tags        = module.labels.tags
 
   endpoint_configuration {
     types            = [var.rest_api_endpoint_type]
-    vpc_endpoint_ids = var.rest_api_endpoint_type == "PRIVATE" ? [aws_vpc_endpoint.rest_api_private[0].id] : null
+    vpc_endpoint_ids = var.rest_api_endpoint_type == "PRIVATE" ? (var.create_vpc_endpoint ? [aws_vpc_endpoint.rest_api_private[0].id] : var.vpc_endpoint_id) : null
   }
+}
 
-  policy = var.rest_api_endpoint_type != "PRIVATE" ? null : <<EOF
+##--------------------------------------------------------------------------------
+# Resource Policy for [aws_api_gateway_rest_api.rest_api]
+##--------------------------------------------------------------------------------
+resource "aws_api_gateway_rest_api_policy" "rest_api_resource_policy" {
+  count = var.enabled && var.create_rest_api && var.rest_api_endpoint_type == "PRIVATE" ? 1 : 0
+
+  rest_api_id = aws_api_gateway_rest_api.rest_api[0].id
+  policy      = var.rest_api_resource_policy != "" ? var.rest_api_resource_policy : <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -247,7 +261,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
             "Effect": "Deny",
             "Principal": "*",
             "Action": "execute-api:Invoke",
-            "Resource": "execute-api:/*",
+            "Resource": "${aws_api_gateway_rest_api.rest_api[0].execution_arn}/*",
             "Condition": {
                 "StringNotEquals": {
                     "aws:sourceVpce": "${aws_vpc_endpoint.rest_api_private[0].id}"
@@ -258,10 +272,10 @@ resource "aws_api_gateway_rest_api" "rest_api" {
             "Effect": "Allow",
             "Principal": "*",
             "Action": "execute-api:Invoke",
-            "Resource": "execute-api:/*"
+            "Resource": "${aws_api_gateway_rest_api.rest_api[0].execution_arn}/*"
         }
     ]
-}
+}  
   EOF
 }
 
@@ -270,7 +284,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_deployment" "rest_api_deployment" {
-  count             = var.enabled && var.create_rest_api_deployment && var.create_rest_api ? 1 : 0
+  count             = var.enabled && var.create_rest_api && var.create_rest_api_deployment ? 1 : 0
   rest_api_id       = aws_api_gateway_rest_api.rest_api[0].id
   description       = var.api_deployment_description
   stage_description = var.stage_description
@@ -294,8 +308,7 @@ resource "aws_api_gateway_deployment" "rest_api_deployment" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_resource" "api_resources" {
-
-  for_each    = var.enabled && var.create_rest_api_gateway_resource && var.create_rest_api ? var.api_resources : {}
+  for_each    = var.enabled && var.create_rest_api && var.create_rest_api_gateway_resource ? var.api_resources : {}
   rest_api_id = aws_api_gateway_rest_api.rest_api[0].id
   parent_id   = aws_api_gateway_rest_api.rest_api[0].root_resource_id
   path_part   = each.value.path_part
@@ -306,7 +319,7 @@ resource "aws_api_gateway_resource" "api_resources" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_method" "api_methods" {
-  for_each      = var.enabled && var.create_rest_api_gateway_method && var.create_rest_api ? var.api_resources : {}
+  for_each      = var.enabled && var.create_rest_api && var.create_rest_api_gateway_method ? var.api_resources : {}
   rest_api_id   = aws_api_gateway_rest_api.rest_api[0].id
   resource_id   = aws_api_gateway_resource.api_resources[each.key].id
   http_method   = each.value.http_method
@@ -318,7 +331,7 @@ resource "aws_api_gateway_method" "api_methods" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_integration" "api_integrations" {
-  for_each                = var.enabled && var.create_rest_api_gateway_integration && var.create_rest_api ? var.api_resources : {}
+  for_each                = var.enabled && var.create_rest_api && var.create_rest_api_gateway_integration ? var.api_resources : {}
   rest_api_id             = aws_api_gateway_rest_api.rest_api[0].id
   resource_id             = aws_api_gateway_resource.api_resources[each.key].id
   http_method             = aws_api_gateway_method.api_methods[each.key].http_method
@@ -341,7 +354,7 @@ resource "aws_api_gateway_integration" "api_integrations" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_method" "rest_api_method" {
-  count         = var.enabled && var.create_rest_api_gateway_method && var.create_rest_api ? 1 : 0
+  count         = var.enabled && var.create_rest_api && var.create_rest_api_gateway_method ? 1 : 0
   authorization = var.authorization
   http_method   = var.http_method
   resource_id   = aws_api_gateway_rest_api.rest_api[0].root_resource_id
@@ -353,7 +366,7 @@ resource "aws_api_gateway_method" "rest_api_method" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_integration" "rest_api_integration" {
-  count                   = var.enabled && var.create_rest_api_gateway_integration && var.create_rest_api ? 1 : 0
+  count                   = var.enabled && var.create_rest_api && var.create_rest_api_gateway_integration ? 1 : 0
   rest_api_id             = aws_api_gateway_rest_api.rest_api[0].id
   resource_id             = aws_api_gateway_method.rest_api_method[0].resource_id
   http_method             = aws_api_gateway_method.rest_api_method[0].http_method
@@ -377,7 +390,7 @@ resource "aws_api_gateway_integration" "rest_api_integration" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_stage" "rest_api_stage" {
-  count                 = var.enabled && var.create_rest_api_gateway_stage && var.create_rest_api ? 1 : 0
+  count                 = var.enabled && var.create_rest_api && var.create_rest_api_gateway_stage ? 1 : 0
   description           = var.description_gateway_stage
   deployment_id         = aws_api_gateway_deployment.rest_api_deployment[0].id
   rest_api_id           = aws_api_gateway_rest_api.rest_api[0].id
@@ -388,17 +401,13 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
   documentation_version = var.documentation_version
   variables             = var.stage_variables
   xray_tracing_enabled  = var.xray_tracing_enabled
-  lifecycle {
-    create_before_destroy = true
-  }
 
   dynamic "canary_settings" {
     for_each = var.canary_settings
     content {
-      percent_traffic          = canary_settings.percent_traffic.value          #var.percent_traffic
-      stage_variable_overrides = canary_settings.stage_variable_overrides.value #var.stage_variable_overrides
-      use_stage_cache          = canary_settings.use_stage_cache.value          #var.use_stage_cache
-
+      percent_traffic          = canary_settings.percent_traffic.value
+      stage_variable_overrides = canary_settings.stage_variable_overrides.value
+      use_stage_cache          = canary_settings.use_stage_cache.value
     }
   }
 
@@ -411,10 +420,12 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
     }
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = module.labels.tags
 }
-
-
 
 ##----------------------------------------------------------------------------------
 ## Below resource will Manages an Amazon REST API Gateway Method Response.
@@ -469,7 +480,7 @@ resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
 ## Below resource will Manages an Amazon REST API Base Path Mapping.
 ##----------------------------------------------------------------------------------
 
-resource "aws_api_gateway_base_path_mapping" "Rest_api_base_path" {
+resource "aws_api_gateway_base_path_mapping" "rest_api_base_path" {
   count       = var.enabled && var.create_rest_api_gateway_authorizer && var.create_rest_api ? 1 : 0
   api_id      = aws_api_gateway_rest_api.rest_api[0].id
   domain_name = var.domain_name
@@ -484,7 +495,21 @@ resource "aws_iam_role" "rest_api_iam_role" {
   count              = var.enabled && var.create_rest_api_gateway_authorizer && var.create_rest_api ? 1 : 0
   name               = format("%s-iam-role", module.labels.id)
   path               = "/"
-  assume_role_policy = var.rest_api_assume_role_policy != "" ? var.rest_api_assume_role_policy : var.rest_api_role
+  assume_role_policy = var.rest_api_assume_role_policy != "" ? var.rest_api_assume_role_policy : <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": "Terraform"
+    }
+  ]
+}
+EOF
 
 }
 
@@ -494,12 +519,12 @@ resource "aws_iam_role" "rest_api_iam_role" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_log_group" "rest_api_log" {
-  count             = var.enabled && var.enable_access_logs && var.create_rest_api ? 1 : 0
+  count             = var.enabled && var.create_rest_api && var.enable_access_logs ? 1 : 0
   name              = module.labels.id
   skip_destroy      = var.skip_destroy
   log_group_class   = var.log_group_class
   retention_in_days = var.retention_in_days
-  kms_key_id        = var.create_kms_key == true ? module.kms_key.key_arn : var.my_kms_key
+  kms_key_id        = var.create_kms_key ? module.kms_key.key_arn : var.kms_key_arn
   tags              = module.labels.tags
 }
 
@@ -508,9 +533,10 @@ resource "aws_cloudwatch_log_group" "rest_api_log" {
 ##----------------------------------------------------------------------------------
 
 module "kms_key" {
+  source  = "clouddrove/kms/aws"
+  version = "1.3.1"
 
-  source              = "clouddrove/kms/aws"
-  enabled             = var.enabled && var.enable_access_logs && var.create_kms_key ? true : false
+  enabled             = var.enabled && var.create_rest_api && var.enable_access_logs && var.create_kms_key ? true : false
   name                = module.labels.id
   enable_key_rotation = var.enable_key_rotation
   multi_region        = var.multi_region
@@ -520,15 +546,12 @@ module "kms_key" {
 ##----------------------------------------------------------------------------------
 ## Below resource will Manages an Kms key JSON POlicy.
 ##----------------------------------------------------------------------------------
-
 data "aws_caller_identity" "current" {}
-
 data "aws_partition" "current" {}
-
 data "aws_region" "current" {}
 
 data "aws_iam_policy_document" "cloudwatch" {
-  count     = var.enable_access_logs && var.enabled ? 1 : 0
+  count     = var.enabled && var.create_rest_api && var.enable_access_logs && var.create_kms_key ? 1 : 0
   policy_id = "key-policy-cloudwatch"
   statement {
     sid = "Enable IAM User Permissions"
@@ -575,15 +598,14 @@ data "aws_iam_policy_document" "cloudwatch" {
 # REST API PRIVATE: This only requires VPC ENDPOINT and RESOURCE POLICY
 ##-----------------------------------------------------------------------
 resource "aws_vpc_endpoint" "rest_api_private" {
-  count = var.enabled && var.create_rest_api && var.rest_api_endpoint_type == "PRIVATE" ? 1 : 0
+  count = var.enabled && var.create_rest_api && var.rest_api_endpoint_type == "PRIVATE" && var.create_vpc_endpoint ? 1 : 0
 
   vpc_id              = var.vpc_id
-  service_name        = var.service_name
+  service_name        = var.service_name != "" ? var.service_name : "com.amazonaws.${data.aws_region.current.name}.execute-api"
   vpc_endpoint_type   = var.vpc_endpoint_type
   private_dns_enabled = var.private_dns_enabled
-
-  subnet_ids         = var.subnet_ids
-  security_group_ids = var.security_group_ids
+  subnet_ids          = var.subnet_ids
+  security_group_ids  = var.security_group_ids
 }
 
 

@@ -10,10 +10,11 @@ provider "aws" {
 ####----------------------------------------------------------------------------------
 
 locals {
-  name        = "api"
-  environment = "test"
-  domain_name = "clouddrove.ca"
-  region      = "us-east-1"
+  name           = "api"
+  environment    = "test"
+  region         = "us-east-1"
+  domain_name    = "clouddrove.ca"
+  hosted_zone_id = "Z015XXXXXXXXXXXXXXIEP"
 }
 ####----------------------------------------------------------------------------------
 ## ACM
@@ -80,8 +81,10 @@ module "rest_api" {
 
   name                        = "${local.name}-rest-api"
   environment                 = local.environment
-  domain_name_certificate_arn = module.acm.arn
   create_rest_api             = true
+  domain_name_certificate_arn = module.acm.arn
+  domain_name                 = "api.${local.domain_name}"
+  zone_id                     = local.hosted_zone_id
   rest_api_description        = "REST API for ${module.lambda.name} lambda function"
   rest_api_endpoint_type      = "REGIONAL"
   integration_uri             = module.lambda.invoke_arn
@@ -101,29 +104,8 @@ module "rest_api" {
   }
 
   #---access log----
-
   enable_access_logs = true
   retention_in_days  = 7
-
-
-  # -- Required
-  domain_name   = local.domain_name
-  zone_id       = "Z015646xxxxxxxxxxx"
-  rest_api_role = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
 }
 
 
