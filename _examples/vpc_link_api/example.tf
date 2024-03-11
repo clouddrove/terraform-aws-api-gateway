@@ -157,7 +157,7 @@ module "lambda" {
 
   name        = local.name
   environment = local.environment
-  enabled     = true
+  enable      = true
   timeout     = 60
   filename    = "./lambda_packages"
   handler     = "index.lambda_handler"
