@@ -13,8 +13,8 @@ locals {
   name           = "api"
   environment    = "test"
   region         = "us-east-1"
-  domain_name    = "clouddrove.ca"
-  hosted_zone_id = "Z015XXXXXXXXXXXXXXIEP"
+  domain_name    = "tech-tycoons.clouddrove.ca"
+  hosted_zone_id = "Z01564602K369XB8J3IEP"
 }
 ####----------------------------------------------------------------------------------
 ## ACM
