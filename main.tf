@@ -242,7 +242,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
 
   endpoint_configuration {
     types            = [var.rest_api_endpoint_type]
-    vpc_endpoint_ids = var.rest_api_endpoint_type == "PRIVATE" ? (var.create_vpc_endpoint ? [aws_vpc_endpoint.rest_api_private[0].id] : "${var.vpc_endpoint_id}") : null
+    vpc_endpoint_ids = var.rest_api_endpoint_type == "PRIVATE" ? (var.create_vpc_endpoint ? [aws_vpc_endpoint.rest_api_private[0].id] : var.vpc_endpoint_id) : null
   }
 }
 
