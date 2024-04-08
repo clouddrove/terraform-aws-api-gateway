@@ -307,7 +307,7 @@ variable "xray_tracing_enabled" {
 
 variable "vpc_endpoint_id" {
   type        = set(string)
-  default     = []
+  default     = [""]
   description = "ID of the vpc endpoint. Only applicable when "
 }
 
