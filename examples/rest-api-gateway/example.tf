@@ -71,42 +71,45 @@ module "lambda" {
   }
 }
 
-####----------------------------------------------------------------------------------
-## API GATEWAY
-####----------------------------------------------------------------------------------
-module "api_gateway" {
-  source = "../../../"
 
-  name                        = local.name
+####----------------------------------------------------------------------------------
+## REST API
+####----------------------------------------------------------------------------------
+
+module "rest_api" {
+  source = "../../."
+
+  name                        = "${local.name}-rest-api"
   environment                 = local.environment
-  domain_name                 = "api.${local.domain_name}"
+  create_rest_api             = true
   domain_name_certificate_arn = module.acm.arn
-  integration_uri             = module.lambda.invoke_arn
+  domain_name                 = "api.${local.domain_name}"
   zone_id                     = local.hosted_zone_id
-  auto_deploy                 = true
-  stage_name                  = "$default"
-  create_vpc_link_enabled     = false
-  create_http_api             = true
-  cors_configuration = {
-    allow_credentials = true
-    allow_methods     = ["GET", "OPTIONS", "POST"]
-    max_age           = 5
-  }
-  integrations = {
-    "ANY /" = {
-      lambda_arn             = module.lambda.arn
-      payload_format_version = "2.0"
-      timeout_milliseconds   = 30000
-    }
-    "GET /some-route-with-authorizer" = {
-      lambda_arn             = module.lambda.arn
-      payload_format_version = "1.0"
-      authorizer_key         = "cognito"
-    }
-    "POST /start-step-function" = {
-      lambda_arn             = module.lambda.arn
-      payload_format_version = "1.0"
-      authorizer_key         = "cognito"
+  rest_api_description        = "REST API for ${module.lambda.name} lambda function"
+  rest_api_endpoint_type      = "REGIONAL"
+  integration_uri             = module.lambda.invoke_arn
+  rest_api_stage_name         = "default"
+  api_resources = {
+    users = {
+      path_part   = "users"
+      http_method = "ANY"
+      uri         = module.lambda.invoke_arn
+
+    },
+    cards = {
+      path_part   = "cards"
+      http_method = "ANY"
+      uri         = module.lambda.invoke_arn
     }
   }
+
+  #---access log----
+  enable_access_logs = true
+  retention_in_days  = 7
 }
+
+
+
+
+
+
