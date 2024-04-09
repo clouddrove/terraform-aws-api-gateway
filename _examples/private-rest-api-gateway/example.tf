@@ -193,7 +193,7 @@ module "security_group" {
 ####----------------------------------------------------------------------------------
 
 module "rest_api_private" {
-  source = "../../../"
+  source = "../../."
 
   name                   = "${local.name}-rest-api-private"
   environment            = local.environment

@@ -77,7 +77,7 @@ module "lambda" {
 ####----------------------------------------------------------------------------------
 
 module "rest_api" {
-  source = "../../../"
+  source = "../../."
 
   name                        = "${local.name}-rest-api"
   environment                 = local.environment

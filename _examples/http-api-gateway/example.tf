@@ -75,7 +75,7 @@ module "lambda" {
 ## API GATEWAY
 ####----------------------------------------------------------------------------------
 module "api_gateway" {
-  source = "../../../"
+  source = "../../."
 
   name                        = local.name
   environment                 = local.environment
