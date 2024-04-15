@@ -16,7 +16,7 @@ updates:
     reviewers:
       - "approvers"
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "_examples/complete" # Location of package manifests
+    directory: "examples/complete" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -26,7 +26,7 @@ updates:
     reviewers:
       - "approvers"
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "_examples/vpc_link_api" # Location of package manifests
+    directory: "examples/vpc_link_api" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
