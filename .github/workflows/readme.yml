@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 jobs:
   README:
-    uses: clouddrove/github-shared-workflows/.github/workflows/readme.yml@1.2.4
+    uses: clouddrove/github-shared-workflows/.github/workflows/readme.yml@master
     secrets:
       TOKEN : ${{ secrets.GITHUB }}
       SLACK_WEBHOOK_TERRAFORM: ${{ secrets.SLACK_WEBHOOK_TERRAFORM }}
