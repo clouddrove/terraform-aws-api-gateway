@@ -18,5 +18,3 @@ output "rest_api_invoke_url" {
   description = "The URL to invoke the API pointing to the stage"
 
 }
-
-

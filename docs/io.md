@@ -127,4 +127,3 @@
 | rest\_api\_execution\_arn | Execution arn of rest api gateway. |
 | rest\_api\_id | The ID of the REST API |
 | rest\_api\_invoke\_url | The URL to invoke the API pointing to the stage |
-
