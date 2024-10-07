@@ -275,7 +275,7 @@ resource "aws_api_gateway_rest_api_policy" "rest_api_resource_policy" {
             "Resource": "${aws_api_gateway_rest_api.rest_api[0].execution_arn}/*"
         }
     ]
-}  
+}
   EOF
 }
 
@@ -607,6 +607,3 @@ resource "aws_vpc_endpoint" "rest_api_private" {
   subnet_ids          = var.subnet_ids
   security_group_ids  = var.security_group_ids
 }
-
-
-

@@ -107,9 +107,3 @@ module "rest_api" {
   enable_access_logs = true
   retention_in_days  = 7
 }
-
-
-
-
-
-

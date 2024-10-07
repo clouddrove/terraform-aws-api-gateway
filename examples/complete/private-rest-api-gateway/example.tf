@@ -92,7 +92,7 @@ module "vpc" {
 ####----------------------------------------------------------------------------------
 ## SUBNETS
 ####----------------------------------------------------------------------------------
-#tfsec:ignore:aws-ec2-no-excessive-port-access 
+#tfsec:ignore:aws-ec2-no-excessive-port-access
 #tfsec:ignore:aws-ec2-no-public-ingress-acl
 module "subnets" {
   source  = "clouddrove/subnet/aws"
@@ -221,5 +221,3 @@ module "rest_api_private" {
   enable_access_logs = true
   retention_in_days  = 7
 }
-
-

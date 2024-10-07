@@ -45,7 +45,7 @@
 <hr>
 
 
-We are a group of DevOps engineers & architects, joining hands in this ever evolving digital landscape. With our strong belief in Automation; just like microservices, always on the lookout to split the the infrastructure into smaller connected resources (database, cluster and more) which could be standardized, are manageable, scalable, secure & follow industry best practices. 
+We are a group of DevOps engineers & architects, joining hands in this ever evolving digital landscape. With our strong belief in Automation; just like microservices, always on the lookout to split the the infrastructure into smaller connected resources (database, cluster and more) which could be standardized, are manageable, scalable, secure & follow industry best practices.
 
 
 This module includes Terraform open source, examples, and automation tests (for better understanding), which would help you create and improve your infrastructure with minimalistic coding.
@@ -79,7 +79,7 @@ This table contains both Prerequisites and Providers:
 Refer to complete documentation: [here](docs/io.md)
 
 
-<!-- 
+<!--
 ## Module Dependencies
 
 This module has dependencies on:
@@ -107,7 +107,7 @@ Refer [here](CHANGELOG.md).
 
 ## ✨ Contributors
 
-Big thanks to our contributors for elevating our project with their dedication and expertise! But, we do not wish to stop there, would like to invite contributions from the community in improving these projects and making them more versatile for better reach. Remember, every bit of contribution is immensely valuable, as, together, we are moving in only 1 direction, i.e. forward. 
+Big thanks to our contributors for elevating our project with their dedication and expertise! But, we do not wish to stop there, would like to invite contributions from the community in improving these projects and making them more versatile for better reach. Remember, every bit of contribution is immensely valuable, as, together, we are moving in only 1 direction, i.e. forward.
 
 <a href="https://github.com/clouddrove/terraform-aws-api-gateway/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=clouddrove/terraform-aws-api-gateway&max" />
@@ -135,7 +135,7 @@ Big thanks to our contributors for elevating our project with their dedication a
 
 
 
-## Feedback 
+## Feedback
 Spot a bug or have thoughts to share with us? Let's squash it together! Log it in our [issue tracker](https://github.com/clouddrove/terraform-aws-api-gateway/issues), feel free to drop us an email at [hello@clouddrove.com](mailto:hello@clouddrove.com).
 
 Show some love with a ★ on [our GitHub](https://github.com/clouddrove/terraform-aws-api-gateway)!  if our work has brightened your day! – your feedback fuels our journey!
@@ -147,7 +147,7 @@ We have [*100+ Terraform modules*][terraform_modules] 🙌. You could consider t
 
 - [Terraform Module Registry:](https://registry.terraform.io/namespaces/clouddrove) Discover our Terraform modules here.
 
-- [Terraform Modules for AWS/Azure Modules:](https://github.com/clouddrove/toc) Explore our comprehensive Table of Contents for easy navigation through our documentation for modules pertaining to AWS, Azure & GCP. 
+- [Terraform Modules for AWS/Azure Modules:](https://github.com/clouddrove/toc) Explore our comprehensive Table of Contents for easy navigation through our documentation for modules pertaining to AWS, Azure & GCP.
 
 - [Terraform Modules for Digital Ocean:](https://github.com/terraform-do-modules/toc) Check out our specialized Terraform modules for Digital Ocean.
 
@@ -173,7 +173,7 @@ Join our tech elites [Join Now][slack] 🚀
  Click [here][blog] :books: :star2:
 
 ## Tap into our capabilities
-We provide a platform for organizations to engage with experienced top-tier DevOps & Cloud services. Tap into our pool of certified engineers and architects to elevate your DevOps and Cloud Solutions. 
+We provide a platform for organizations to engage with experienced top-tier DevOps & Cloud services. Tap into our pool of certified engineers and architects to elevate your DevOps and Cloud Solutions.
 
 At [CloudDrove][website], has extensive experience in designing, building & migrating environments, securing, consulting, monitoring, optimizing, automating, and maintaining complex and large modern systems. With remarkable client footprints in American & European corridors, our certified architects & engineers are ready to serve you as per your requirements & schedule. Write to us at [business@clouddrove.com](mailto:business@clouddrove.com).
 
