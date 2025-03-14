@@ -536,12 +536,13 @@ module "kms_key" {
   source  = "clouddrove/kms/aws"
   version = "1.3.1"
 
-  enabled             = var.enabled && var.create_rest_api && var.enable_access_logs && var.create_kms_key ? true : false
+  enabled             = var.enabled && var.enable_access_logs && var.create_kms_key ? true : false
   name                = module.labels.id
   enable_key_rotation = var.enable_key_rotation
   multi_region        = var.multi_region
   policy              = data.aws_iam_policy_document.cloudwatch[0].json
 }
+
 
 ##----------------------------------------------------------------------------------
 ## Below resource will Manages an Kms key JSON POlicy.
@@ -551,7 +552,7 @@ data "aws_partition" "current" {}
 data "aws_region" "current" {}
 
 data "aws_iam_policy_document" "cloudwatch" {
-  count     = var.enabled && var.create_rest_api && var.enable_access_logs && var.create_kms_key ? 1 : 0
+  count     = var.enabled && var.enable_access_logs && var.create_kms_key ? 1 : 0
   policy_id = "key-policy-cloudwatch"
   statement {
     sid = "Enable IAM User Permissions"
