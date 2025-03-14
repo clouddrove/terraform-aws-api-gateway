@@ -108,7 +108,7 @@
 | target | Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP\_PROXY or AWS\_PROXY, respectively. Applicable for HTTP APIs. | `string` | `null` | no |
 | timeout\_milliseconds | Custom timeout between 50 and 29,000 milliseconds. The default value is 29,000 milliseconds. | `number` | `null` | no |
 | type | Type of the authorizer. Possible values are TOKEN for a Lambda function using a single authorization token submitted in a custom header, REQUEST for a Lambda function using incoming request parameters, or COGNITO\_USER\_POOLS for using an Amazon Cognito user pool. Defaults to TOKEN. | `string` | `"TOKEN"` | no |
-| vpc\_endpoint\_id | ID of the vpc endpoint. Only applicable when | `string` | `""` | no |
+| vpc\_endpoint\_id | ID of the vpc endpoint. Only applicable when | `set(string)` | <pre>[<br>  ""<br>]</pre> | no |
 | vpc\_endpoint\_type | The VPC endpoint type, Gateway, GatewayLoadBalancer, or Interface. Defaults to Gateway. | `string` | `"Gateway"` | no |
 | vpc\_id | The ID of the VPC in which the endpoint will be used. | `string` | `""` | no |
 | vpc\_links | Map of VPC Links details to create | `map(any)` | `{}` | no |
