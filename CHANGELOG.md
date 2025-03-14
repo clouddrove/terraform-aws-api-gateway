@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-03-14
+### :sparkles: New Features
+- [`50cf105`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/50cf1051642fb29642d227d51256c37ab8fb4fc6) - Add automerge github shared workflow *(PR [#58](https://github.com/clouddrove/terraform-aws-api-gateway/pull/58) by [@vaibhav7797](https://github.com/vaibhav7797))*
+- [`32d8469`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/32d8469e8a30aff35159a5e3e31107eb8bc37df1) - updated example path and readme parameters *(PR [#61](https://github.com/clouddrove/terraform-aws-api-gateway/pull/61) by [@Tanveer143s](https://github.com/Tanveer143s))*
+- [`4781229`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/47812297ac350d8d17f77574adcfe49eadb193b7) - updated branch name in uses of workflow *(PR [#62](https://github.com/clouddrove/terraform-aws-api-gateway/pull/62) by [@rakeshclouddevops](https://github.com/rakeshclouddevops))*
+
+### :bug: Bug Fixes
+- [`2d0cee3`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/2d0cee303784cc3168a3365bd5ca8ff9b37343de) - Error in count condition of HTTP-Api-Gateway *(PR [#60](https://github.com/clouddrove/terraform-aws-api-gateway/pull/60) by [@Aatishsharma77](https://github.com/Aatishsharma77))*
+
+### :construction_worker: Build System
+- [`01808ac`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/01808acac8afbcf52a156ce5f0125225d419c9ba) - **deps**: bump clouddrove/subnet/aws in /_examples/vpc_link_api *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+- [`b2a71c7`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/b2a71c724381371d19f028447ee16529c0c906ed) - **deps**: bump clouddrove/lambda/aws in /_examples/vpc_link_api *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+- [`373ad50`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/373ad50f02bac6a35effaa844b65c862a5220b49) - **deps**: bump clouddrove/lambda/aws in /_examples/complete *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+
+### :memo: Documentation Changes
+- [`c9417b5`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/c9417b5e9985d7b9eab1a9ceeef1135b7be350a9) - update CHANGELOG.md for 1.4.1 *(commit by [@clouddrove-ci](https://github.com/clouddrove-ci))*
+
+
 ## [1.4.1] - 2023-11-15
 ### :sparkles: New Features
 - [`3264a48`](https://github.com/clouddrove/terraform-aws-api-gateway/commit/3264a489ebdf1664dfcfb101777eb28a5b7c5d50) - Added new vpc tag *(commit by [@theprashantyadav](https://github.com/theprashantyadav))*
@@ -101,3 +119,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [1.4.0]: https://github.com/clouddrove/terraform-aws-api-gateway/compare/1.0.1...1.4.0
 [1.4.1]: https://github.com/clouddrove/terraform-aws-api-gateway/compare/1.4.0...1.4.1
+[1.5.0]: https://github.com/clouddrove/terraform-aws-api-gateway/compare/1.4.1...1.5.0
