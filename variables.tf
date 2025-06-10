@@ -706,3 +706,8 @@ variable "rest_api_resource_policy" {
   default     = ""
   description = "(Optional) custom resource policy for private rest api."
 }
+
+variable "vpc_endpoint_id" {
+  description = "The ID of the VPC endpoint"
+  type        = string
+}
