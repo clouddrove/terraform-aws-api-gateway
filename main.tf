@@ -275,7 +275,7 @@ resource "aws_api_gateway_rest_api_policy" "rest_api_resource_policy" {
             "Resource": "${aws_api_gateway_rest_api.rest_api[0].execution_arn}/*"
         }
     ]
-}  
+}
   EOF
 }
 
