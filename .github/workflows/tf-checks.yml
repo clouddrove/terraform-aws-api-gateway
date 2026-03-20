@@ -10,8 +10,10 @@ jobs:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/'
+      provider: none
   tf-checks-basic-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/vpc_link_api/'
+      provider: none
 ...
