@@ -1,21 +1,29 @@
 repos:
-
-  - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.12 # Get the latest from: https://github.com/gruntwork-io/pre-commit/releases
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.105.0
     hooks:
-      - id: terraform-fmt
-      - id: shellcheck
-      - id: tflint
-
-  - repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1 # Use the ref you want to point at
+      - id: terraform_fmt
+      - id: terraform_docs
+        args:
+          - '--args=--lockfile=false'
+      - id: terraform_tflint
+        args:
+          - '--args=--only=terraform_deprecated_interpolation'
+          - '--args=--only=terraform_deprecated_index'
+          - '--args=--only=terraform_unused_declarations'
+          - '--args=--only=terraform_comment_syntax'
+          - '--args=--only=terraform_documented_outputs'
+          - '--args=--only=terraform_documented_variables'
+          - '--args=--only=terraform_typed_variables'
+          - '--args=--only=terraform_module_pinned_source'
+          - '--args=--only=terraform_naming_convention'
+          - '--args=--only=terraform_required_version'
+          - '--args=--only=terraform_required_providers'
+          - '--args=--only=terraform_standard_module_structure'
+      - id: terraform_validate
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
     hooks:
+      - id: check-merge-conflict
       - id: end-of-file-fixer
       - id: trailing-whitespace
-      - id: mixed-line-ending
-      - id: check-byte-order-marker
-      - id: check-executables-have-shebangs
-      - id: check-merge-conflict
-      - id: debug-statements
-      - id: check-yaml
-      - id: check-added-large-files
