@@ -1,0 +1,37 @@
+name: pre-commit
+on:
+  pull_request:
+    branches: [master, main]
+
+env:
+  TERRAFORM_DOCS_VERSION: v0.20.0
+  TFLINT_VERSION: v0.59.1
+
+jobs:
+  pre-commit:
+    name: pre-commit checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: ${{ env.TFLINT_VERSION }}
+
+      - name: Setup terraform-docs
+        run: |
+          curl -sSLo terraform-docs.tar.gz https://terraform-docs.io/dl/${{ env.TERRAFORM_DOCS_VERSION }}/terraform-docs-${{ env.TERRAFORM_DOCS_VERSION }}-$(uname)-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz terraform-docs
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+
+      - name: Setup pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit
+        run: SKIP=terraform_validate,terraform_tflint pre-commit run -a --show-diff-on-failure || true
