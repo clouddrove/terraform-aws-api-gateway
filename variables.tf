@@ -467,12 +467,6 @@ variable "api_deployment_description" {
   description = "flag to manage description of api deployment"
 }
 
-variable "stage_description" {
-  type        = string
-  default     = "test"
-  description = "Description to set on the stage managed by the stage_name argument."
-}
-
 variable "rest_variables" {
   type        = map(string)
   default     = {}

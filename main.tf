@@ -284,11 +284,10 @@ resource "aws_api_gateway_rest_api_policy" "rest_api_resource_policy" {
 ##----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_deployment" "rest_api_deployment" {
-  count             = var.enabled && var.create_rest_api && var.create_rest_api_deployment ? 1 : 0
-  rest_api_id       = aws_api_gateway_rest_api.rest_api[0].id
-  description       = var.api_deployment_description
-  stage_description = var.stage_description
-  variables         = var.rest_variables
+  count       = var.enabled && var.create_rest_api && var.create_rest_api_deployment ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.rest_api[0].id
+  description = var.api_deployment_description
+  variables   = var.rest_variables
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_rest_api.rest_api[0].body,
