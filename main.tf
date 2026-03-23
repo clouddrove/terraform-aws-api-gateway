@@ -533,7 +533,7 @@ resource "aws_cloudwatch_log_group" "rest_api_log" {
 
 module "kms_key" {
   source  = "clouddrove/kms/aws"
-  version = "1.3.1"
+  version = "1.3.2"
 
   enabled             = var.enabled && var.enable_access_logs && var.create_kms_key ? true : false
   name                = module.labels.id
