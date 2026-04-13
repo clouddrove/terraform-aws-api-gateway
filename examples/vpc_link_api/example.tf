@@ -16,7 +16,7 @@ locals {
 ####----------------------------------------------------------------------------------
 module "vpc" {
   source  = "clouddrove/vpc/aws"
-  version = "2.0.1"
+  version = "2.0.3"
 
   name        = local.name
   environment = local.environment
