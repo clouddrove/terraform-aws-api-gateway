@@ -4,9 +4,9 @@ on:
   pull_request:
 jobs:
   auto-merge:
-    uses: clouddrove/github-shared-workflows/.github/workflows/auto_merge.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/pr-auto-merge.yml@master
     secrets:
-      GITHUB: ${{ secrets.GITHUB }}
+      GITHUB: ${{ secrets.GITHUB_TOKEN }}
     with:
       tfcheck: 'tf-checks-complete-example / Check code format'
 ...
