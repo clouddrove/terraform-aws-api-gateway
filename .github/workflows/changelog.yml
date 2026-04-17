@@ -1,15 +1,15 @@
----
-name: changelog
-permissions: write-all
+name: Release
+
 on:
-  push:
-    tags:
-      - "*"
-  workflow_dispatch:
+  release:
+    types: [published]
+
 jobs:
-  call-workflow-changelog:
-    uses: clouddrove/github-shared-workflows/.github/workflows/changelog.yml@master
-    secrets: inherit
+  changelog:
+    uses: clouddrove/github-shared-workflows/.github/workflows/release-changelog.yml@master
     with:
-      branch: 'master'
-...
+      branch: master
+      tag_format: vX.Y.Z
+      release_tag: ${{ github.ref_name }}
+    secrets:
+      GITHUB: ${{ secrets.GITHUB_TOKEN }}
