@@ -1,3 +1,4 @@
+---
 name: 🔍 PR Checks
 
 on:
@@ -7,3 +8,4 @@ jobs:
   pr-validation:
     if: github.actor != 'dependabot[bot]'
     uses: clouddrove/github-shared-workflows/.github/workflows/pr-checks.yml@master
+...
