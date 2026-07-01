@@ -100,7 +100,6 @@
 | security\_group\_ids | A list of security group IDs to associate with. | `list(string)` | `[]` | no |
 | service\_name | The service name. For AWS services the service name is usually in the form com.amazonaws.<region>.<service> (the SageMaker Notebook service is an exception to this rule, the service name is in the form aws.sagemaker.<region>.notebook). | `string` | `""` | no |
 | skip\_destroy | Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state. | `bool` | `null` | no |
-| stage\_description | Description to set on the stage managed by the stage\_name argument. | `string` | `"test"` | no |
 | stage\_name | Stage Name to be used, set to `$default` to use Invoke URL as your default webpage for lambda | `string` | `null` | no |
 | stage\_variables | Map that defines the stage variables | `map(string)` | `{}` | no |
 | status\_code | flag to control the status code | `string` | `"200"` | no |

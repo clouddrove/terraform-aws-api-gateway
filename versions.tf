@@ -10,6 +10,6 @@ terraform {
   }
 
   provider_meta "aws" {
-    module_name = "clouddrove/terraform-aws-api-gateway"
+    user_agent = ["github.com/clouddrove/terraform-aws-api-gateway"]
   }
 }
