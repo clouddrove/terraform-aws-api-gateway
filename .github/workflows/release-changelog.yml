@@ -6,7 +6,7 @@ on:
 
 jobs:
   changelog:
-    uses: clouddrove/github-shared-workflows/.github/workflows/release-changelog.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/release-changelog.yml@v2
     with:
       branch: master
       tag_format: vX.Y.Z

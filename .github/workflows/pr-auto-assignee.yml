@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   assignee:
-    uses: clouddrove/github-shared-workflows/.github/workflows/pr-auto-assignee.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/pr-auto-assignee.yml@v2
     secrets:
       GITHUB: ${{ secrets.GITHUB_TOKEN }}
     with:

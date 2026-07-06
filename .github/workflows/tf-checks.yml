@@ -11,7 +11,7 @@ on:
 jobs:
   tf-checks-complete-example:
     if: github.actor != 'dependabot[bot]'
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@v2
     with:
       working_directory: './examples/'
       provider: aws
@@ -21,7 +21,7 @@ jobs:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   tf-checks-basic-example:
     if: github.actor != 'dependabot[bot]'
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@v2
     with:
       working_directory: './examples/vpc_link_api/'
       provider: aws
