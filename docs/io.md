@@ -108,6 +108,7 @@
 | stage\_variables | Map that defines the stage variables | `map(string)` | `{}` | no |
 | status\_code | flag to control the status code | `string` | `"200"` | no |
 | subnet\_ids | A list of VPC Subnet IDs to launch in. | `list(string)` | `[]` | no |
+| tags | Additional tags applied to every resource this module manages, merged into the labels module as extra\_tags. | `map(string)` | `{}` | no |
 | target | Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP\_PROXY or AWS\_PROXY, respectively. Applicable for HTTP APIs. | `string` | `null` | no |
 | timeout\_milliseconds | Custom timeout between 50 and 29,000 milliseconds. The default value is 29,000 milliseconds. | `number` | `null` | no |
 | type | Type of the authorizer. Possible values are TOKEN for a Lambda function using a single authorization token submitted in a custom header, REQUEST for a Lambda function using incoming request parameters, or COGNITO\_USER\_POOLS for using an Amazon Cognito user pool. Defaults to TOKEN. | `string` | `"TOKEN"` | no |
@@ -125,9 +126,13 @@
 | api\_arn | The HTTP API ARN. |
 | api\_endpoint | The URI of the API, of the form {api-id}.execute-api.{region}.amazonaws.com. |
 | api\_id | The HTTP Api ID. |
+| domain\_name\_regional\_target | Regional target hostname of the custom domain, for a Route53 alias record. |
+| domain\_name\_regional\_zone\_id | Hosted zone id of the custom domain's regional endpoint, for a Route53 alias record. |
 | invoke\_url | URL to invoke the API pointing to the stage |
 | rest\_api\_arn | The Rest Api Arn. |
 | rest\_api\_execution\_arn | Execution arn of rest api gateway. |
 | rest\_api\_id | The ID of the REST API |
 | rest\_api\_invoke\_url | The URL to invoke the API pointing to the stage |
+| rest\_api\_stage\_name | Name of the REST API stage. |
+| rest\_api\_vpc\_link\_id | ID of the REST API VPC link, when one was created. |
 
