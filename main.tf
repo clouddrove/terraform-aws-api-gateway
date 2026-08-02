@@ -57,10 +57,10 @@ resource "aws_apigatewayv2_domain_name" "default" {
   }
 
   dynamic "mutual_tls_authentication" {
-    for_each = var.mutual_tls_authentication
+    for_each = length(var.mutual_tls_authentication) > 0 ? [var.mutual_tls_authentication] : []
     content {
-      truststore_uri     = mutual_tls_authentication.value.truststore_uri
-      truststore_version = lookup(mutual_tls_authentication.value.truststore_version, null)
+      truststore_uri     = mutual_tls_authentication.value["truststore_uri"]
+      truststore_version = lookup(mutual_tls_authentication.value, "truststore_version", null)
     }
   }
 
@@ -139,6 +139,19 @@ resource "aws_apigatewayv2_api_mapping" "default" {
   api_id      = join("", aws_apigatewayv2_api.default[*].id)
   domain_name = join("", aws_apigatewayv2_domain_name.default[*].id)
   stage       = join("", aws_apigatewayv2_stage.default[*].id)
+}
+
+##----------------------------------------------------------------------------------
+## Below resource maps the same custom domain to a REST API stage. An
+## apigatewayv2 domain name accepts REST API mappings, which is what lets a
+## REST API sit behind a mutual-TLS custom domain.
+##----------------------------------------------------------------------------------
+resource "aws_apigatewayv2_api_mapping" "rest_api" {
+  count = var.enabled && var.apigatewayv2_api_mapping_enabled && var.create_rest_api && var.create_api_domain_name_enabled ? 1 : 0
+
+  api_id      = join("", aws_api_gateway_rest_api.rest_api[*].id)
+  domain_name = join("", aws_apigatewayv2_domain_name.default[*].id)
+  stage       = join("", aws_api_gateway_stage.rest_api_stage[*].stage_name)
 }
 
 ##----------------------------------------------------------------------------------
@@ -240,6 +253,8 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   description = var.rest_api_description
   tags        = module.labels.tags
 
+  disable_execute_api_endpoint = var.disable_execute_api_endpoint
+
   endpoint_configuration {
     types            = [var.rest_api_endpoint_type]
     vpc_endpoint_ids = var.rest_api_endpoint_type == "PRIVATE" ? (var.create_vpc_endpoint ? [aws_vpc_endpoint.rest_api_private[0].id] : var.vpc_endpoint_id) : null
@@ -326,6 +341,20 @@ resource "aws_api_gateway_method" "api_methods" {
 }
 
 ##----------------------------------------------------------------------------------
+## Below resource will Manage a REST API Gateway VPC link (v1). A REST API
+## private integration cannot use an apigatewayv2 VPC link, and its targets
+## must be network load balancers.
+##----------------------------------------------------------------------------------
+resource "aws_api_gateway_vpc_link" "rest_api_vpc_link" {
+  count = var.enabled && var.create_rest_api && var.create_rest_api_vpc_link_enabled ? 1 : 0
+
+  name        = module.labels.id
+  description = var.rest_api_vpc_link_description
+  target_arns = var.rest_api_vpc_link_target_arns
+  tags        = module.labels.tags
+}
+
+##----------------------------------------------------------------------------------
 ## Below resource will Manages an Amazon REST API Gateway Integration.
 ##----------------------------------------------------------------------------------
 
@@ -338,7 +367,7 @@ resource "aws_api_gateway_integration" "api_integrations" {
   type                    = var.gateway_integration_type
   uri                     = each.value.uri
   connection_type         = var.connection_rest_api_type
-  connection_id           = var.connection_id
+  connection_id           = var.connection_id != "" ? var.connection_id : join("", aws_api_gateway_vpc_link.rest_api_vpc_link[*].id)
   credentials             = var.credentials
   request_templates       = var.request_templates
   request_parameters      = var.request_parameters
@@ -371,7 +400,7 @@ resource "aws_api_gateway_integration" "rest_api_integration" {
   http_method             = aws_api_gateway_method.rest_api_method[0].http_method
   integration_http_method = var.integration_http_method
   connection_type         = var.connection_rest_api_type
-  connection_id           = var.connection_id
+  connection_id           = var.connection_id != "" ? var.connection_id : join("", aws_api_gateway_vpc_link.rest_api_vpc_link[*].id)
   credentials             = var.credentials
   request_templates       = var.request_templates
   request_parameters      = var.request_parameters
@@ -402,11 +431,12 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
   xray_tracing_enabled  = var.xray_tracing_enabled
 
   dynamic "canary_settings" {
-    for_each = var.canary_settings
+    for_each = length(var.canary_settings) > 0 ? [var.canary_settings] : []
     content {
-      percent_traffic          = canary_settings.percent_traffic.value
-      stage_variable_overrides = canary_settings.stage_variable_overrides.value
-      use_stage_cache          = canary_settings.use_stage_cache.value
+      deployment_id            = aws_api_gateway_deployment.rest_api_deployment[0].id
+      percent_traffic          = lookup(canary_settings.value, "percent_traffic", null)
+      stage_variable_overrides = lookup(canary_settings.value, "stage_variable_overrides", null)
+      use_stage_cache          = lookup(canary_settings.value, "use_stage_cache", null)
     }
   }
 
@@ -586,7 +616,7 @@ data "aws_iam_policy_document" "cloudwatch" {
       identifiers = [
         format(
           "logs.%s.amazonaws.com",
-          data.aws_region.current.name
+          data.aws_region.current.region
         )
       ]
     }
@@ -601,7 +631,7 @@ resource "aws_vpc_endpoint" "rest_api_private" {
   count = var.enabled && var.create_rest_api && var.rest_api_endpoint_type == "PRIVATE" && var.create_vpc_endpoint ? 1 : 0
 
   vpc_id              = var.vpc_id
-  service_name        = var.service_name != "" ? var.service_name : "com.amazonaws.${data.aws_region.current.name}.execute-api"
+  service_name        = var.service_name != "" ? var.service_name : "com.amazonaws.${data.aws_region.current.region}.execute-api"
   vpc_endpoint_type   = var.vpc_endpoint_type
   private_dns_enabled = var.private_dns_enabled
   subnet_ids          = var.subnet_ids
