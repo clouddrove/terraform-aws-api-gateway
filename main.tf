@@ -10,6 +10,7 @@ module "labels" {
   managedby   = var.managedby
   label_order = var.label_order
   repository  = var.repository
+  extra_tags  = var.tags
 }
 
 ##----------------------------------------------------------------------------------
@@ -71,7 +72,7 @@ resource "aws_apigatewayv2_domain_name" "default" {
 ## Below Provides a Route53 record resource.
 ##----------------------------------------------------------------------------------
 resource "aws_route53_record" "default" {
-  count = var.enabled && (var.create_http_api || var.create_rest_api) && var.rest_api_endpoint_type != "PRIVATE" ? 1 : 0
+  count = var.enabled && (var.create_http_api || var.create_rest_api) && var.rest_api_endpoint_type != "PRIVATE" && var.zone_id != "" ? 1 : 0
 
   name    = join("", aws_apigatewayv2_domain_name.default[*].domain_name)
   type    = "A"
