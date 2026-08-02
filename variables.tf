@@ -724,3 +724,9 @@ variable "rest_api_vpc_link_description" {
   default     = "Managed by Terraform"
   description = "Description applied to the REST API VPC link."
 }
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Additional tags applied to every resource this module manages, merged into the labels module as extra_tags."
+}
