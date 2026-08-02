@@ -13,7 +13,7 @@ jobs:
     if: github.actor != 'dependabot[bot]'
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@v2
     with:
-      working_directory: './examples/'
+      working_directory: './examples/complete/rest-api-gateway/'
       provider: aws
       enable_plan: true
       show_plan: false

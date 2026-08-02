@@ -700,3 +700,27 @@ variable "rest_api_resource_policy" {
   default     = ""
   description = "(Optional) custom resource policy for private rest api."
 }
+
+variable "disable_execute_api_endpoint" {
+  type        = bool
+  default     = false
+  description = "Whether clients can invoke the REST API using the default execute-api endpoint. Set to true when the API is fronted by a custom domain that enforces mutual TLS: leaving the default endpoint enabled lets a client bypass the custom domain, and therefore the truststore, entirely."
+}
+
+variable "create_rest_api_vpc_link_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether to create a REST API (v1) VPC link. Required for a REST API private integration: an apigatewayv2 VPC link cannot serve one."
+}
+
+variable "rest_api_vpc_link_target_arns" {
+  type        = list(string)
+  default     = []
+  description = "Network load balancer ARNs the REST API VPC link targets. REST VPC links accept network load balancers only."
+}
+
+variable "rest_api_vpc_link_description" {
+  type        = string
+  default     = "Managed by Terraform"
+  description = "Description applied to the REST API VPC link."
+}
