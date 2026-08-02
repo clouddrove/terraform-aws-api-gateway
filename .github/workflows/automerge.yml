@@ -1,3 +1,4 @@
+---
 name: Auto merge
 
 on:
@@ -10,10 +11,9 @@ permissions:
 
 jobs:
   auto-merge:
-    if: github.actor == 'dependabot[bot]'
     uses: clouddrove/github-shared-workflows/.github/workflows/pr-auto-merge.yml@v2
-    with:
-      azure_cloud: true
-      tfchecks_azure: '["tf-lint / tflint"]'
     secrets:
-      GITHUB: ${{ secrets.GITHUB }}
+      GITHUB: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      tfcheck: 'complete / Check code format'
+...

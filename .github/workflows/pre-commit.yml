@@ -1,3 +1,4 @@
+---
 name: pre-commit
 on:
   pull_request:
@@ -35,3 +36,4 @@ jobs:
 
       - name: Run pre-commit
         run: SKIP=terraform_validate,terraform_tflint pre-commit run -a --show-diff-on-failure || true
+...
