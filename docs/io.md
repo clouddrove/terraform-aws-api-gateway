@@ -40,6 +40,7 @@
 | create\_rest\_api\_gateway\_method\_response | Flag to control the rest api gateway stage creation. | `bool` | `true` | no |
 | create\_rest\_api\_gateway\_resource | flag to control the rest api gateway resources creation | `bool` | `true` | no |
 | create\_rest\_api\_gateway\_stage | Flag to control the rest api gateway stage creation. | `bool` | `true` | no |
+| create\_rest\_api\_vpc\_link\_enabled | Whether to create a REST API (v1) VPC link. Required for a REST API private integration: an apigatewayv2 VPC link cannot serve one. | `bool` | `false` | no |
 | create\_routes\_and\_integrations\_enabled | Whether to create routes and integrations resources | `bool` | `true` | no |
 | create\_vpc\_endpoint | VPC endpoint is required to access api gateway url from outside the vpc. Set this to `false` to prevent vpc endpoint creation. | `bool` | `true` | no |
 | create\_vpc\_link\_enabled | Whether to create VPC links | `bool` | `true` | no |
@@ -49,6 +50,7 @@
 | default\_stage\_access\_log\_destination\_arn | ARN of the CloudWatch Logs log group to receive access logs. | `string` | `null` | no |
 | default\_stage\_access\_log\_format | Single line format of the access logs of data. Refer to log settings for HTTP or Websocket. | `string` | `null` | no |
 | description\_gateway\_stage | (optional) describe your variable | `string` | `"demo-test"` | no |
+| disable\_execute\_api\_endpoint | Whether clients can invoke the REST API using the default execute-api endpoint. Set to true when the API is fronted by a custom domain that enforces mutual TLS: leaving the default endpoint enabled lets a client bypass the custom domain, and therefore the truststore, entirely. | `bool` | `false` | no |
 | documentation\_version | Version of the associated API documentation | `string` | `""` | no |
 | domain\_name | The domain name to use for API gateway | `string` | `null` | no |
 | domain\_name\_certificate\_arn | The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name | `string` | `""` | no |
@@ -92,6 +94,8 @@
 | rest\_api\_endpoint\_type | (Required) List of endpoint types. This resource currently only supports managing a single value. Valid values: EDGE, REGIONAL or PRIVATE. If unspecified, defaults to EDGE. | `string` | `null` | no |
 | rest\_api\_resource\_policy | (Optional) custom resource policy for private rest api. | `string` | `""` | no |
 | rest\_api\_stage\_name | The name of the stage | `string` | `""` | no |
+| rest\_api\_vpc\_link\_description | Description applied to the REST API VPC link. | `string` | `"Managed by Terraform"` | no |
+| rest\_api\_vpc\_link\_target\_arns | Network load balancer ARNs the REST API VPC link targets. REST VPC links accept network load balancers only. | `list(string)` | `[]` | no |
 | rest\_variables | Map to set on the stage managed by the stage\_name argument. | `map(string)` | `{}` | no |
 | retention\_in\_days | Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653, and 0. If you select 0, the events in the log group are always retained and never expire. | `number` | `null` | no |
 | route\_key | Part of quick create. Specifies any route key. Applicable for HTTP APIs. | `string` | `null` | no |
