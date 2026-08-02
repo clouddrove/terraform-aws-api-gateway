@@ -160,9 +160,15 @@ module "http_https" {
 ####----------------------------------------------------------------------------------
 ## This terraform module is designed to generate consistent label names and tags for resources.
 ####----------------------------------------------------------------------------------
+# Pinned to the v1.4.3 tag rather than a registry version: 1.4.2 (the newest
+# published release) creates aws_route53_record.default ungated while gating
+# data.aws_route53_zone.default on enable_dns_validation, so any caller with
+# enable_dns_validation = false fails validate with "Invalid index ...
+# data.aws_route53_zone.default is empty tuple". v1.4.3 gates both, but the
+# release was never ingested by the registry. Swap back to
+# `version = "1.4.3"` once it is published.
 module "acm" {
-  source  = "clouddrove/acm/aws"
-  version = "1.4.2"
+  source = "git::https://github.com/clouddrove/terraform-aws-acm.git?ref=v1.4.3"
 
   name                      = local.name
   environment               = local.environment
