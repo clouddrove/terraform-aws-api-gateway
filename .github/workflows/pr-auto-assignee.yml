@@ -1,6 +1,11 @@
 ---
 name: Auto Assign PRs
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 on:
   pull_request:
     types: [opened, reopened]
