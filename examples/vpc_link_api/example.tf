@@ -178,7 +178,7 @@ module "acm" {
 ####----------------------------------------------------------------------------------
 module "lambda" {
   source  = "clouddrove/lambda/aws"
-  version = "1.3.2"
+  version = "1.3.3"
 
   name        = local.name
   environment = local.environment
