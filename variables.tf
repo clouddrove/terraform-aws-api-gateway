@@ -147,7 +147,7 @@ variable "access_log_settings" {
 }
 
 variable "default_route_settings" {
-  type        = map(string)
+  type        = any
   default     = {}
   description = "Default route settings for the stage."
 }
@@ -578,9 +578,9 @@ variable "rest_api_base_path" {
 }
 
 variable "api_resources" {
-  type        = map(map(string))
+  type        = map(any)
   default     = {}
-  description = "flag to control of resources path"
+  description = "Map of REST API resources, methods, and integrations to create."
 }
 
 variable "log_format" {
@@ -729,4 +729,158 @@ variable "tags" {
   type        = map(string)
   default     = {}
   description = "Additional tags applied to every resource this module manages, merged into the labels module as extra_tags."
+}
+
+##-----------------------------------------------------------------------
+## ADDITIONAL HTTP / WEBSOCKET & REST API FEATURES
+##-----------------------------------------------------------------------
+
+variable "ip_address_type" {
+  type        = string
+  default     = "ipv4"
+  description = "The IP address types that can invoke the API or custom domain name. Valid values: `ipv4`, `dualstack`."
+}
+
+variable "fail_on_warnings" {
+  type        = bool
+  default     = null
+  description = "Whether warnings should return an error while API Gateway is creating or updating the resource using an OpenAPI specification."
+}
+
+variable "domain_name_endpoint_type" {
+  type        = string
+  default     = "REGIONAL"
+  description = "Endpoint type for the API Gateway custom domain name. Valid values: `REGIONAL`."
+}
+
+variable "domain_name_security_policy" {
+  type        = string
+  default     = "TLS_1_2"
+  description = "Transport Layer Security (TLS) version of the security policy for the custom domain name."
+}
+
+variable "create_default_cognito_authorizer" {
+  type        = bool
+  default     = false
+  description = "Whether to create the default Cognito User Pool and JWT authorizer for HTTP APIs."
+}
+
+variable "enable_http_api_access_logs" {
+  type        = bool
+  default     = false
+  description = "Whether to create a CloudWatch Log Group and enable access logging for the HTTP/WebSocket API stage."
+}
+
+variable "rest_api_body" {
+  type        = string
+  default     = null
+  description = "An OpenAPI specification that defines the set of routes and integrations to create as part of the REST API."
+}
+
+variable "put_rest_api_mode" {
+  type        = string
+  default     = null
+  description = "Mode of the PutRestApi operation when importing an OpenAPI specification. Valid values: `overwrite`, `merge`."
+}
+
+variable "binary_media_types" {
+  type        = list(string)
+  default     = null
+  description = "List of binary media types supported by the REST API."
+}
+
+variable "minimum_compression_size" {
+  type        = number
+  default     = null
+  description = "Minimum response size to compress for the REST API (between 0 and 10485760 bytes, or -1 to disable)."
+}
+
+variable "api_key_source" {
+  type        = string
+  default     = null
+  description = "Source of the API key for requests. Valid values: `HEADER`, `AUTHORIZER`."
+}
+
+variable "rest_api_security_policy" {
+  type        = string
+  default     = null
+  description = "TLS security policy for the REST API default execute-api endpoint (e.g. `SecurityPolicy_TLS13_2025_EDGE`)."
+}
+
+variable "api_key_required" {
+  type        = bool
+  default     = false
+  description = "Whether an API key is required for the REST API method."
+}
+
+variable "response_transfer_mode" {
+  type        = string
+  default     = null
+  description = "Response transfer mode of the REST API integration for response streaming. Valid values: `BUFFERED`, `STREAM`."
+}
+
+variable "rest_api_method_settings" {
+  type        = any
+  default     = {}
+  description = "Stage-level method settings for the REST API (throttling, caching, metrics, logging)."
+}
+
+variable "request_validators" {
+  type        = map(any)
+  default     = {}
+  description = "Map of REST API request validators to create."
+}
+
+variable "gateway_responses" {
+  type        = map(any)
+  default     = {}
+  description = "Map of REST API gateway responses keyed by response_type (e.g. `DEFAULT_4XX`, `DEFAULT_5XX`)."
+}
+
+variable "create_usage_plan" {
+  type        = bool
+  default     = false
+  description = "Whether to create a REST API usage plan."
+}
+
+variable "usage_plan_name" {
+  type        = string
+  default     = ""
+  description = "Name of the REST API usage plan."
+}
+
+variable "usage_plan_description" {
+  type        = string
+  default     = "Managed by Terraform"
+  description = "Description of the REST API usage plan."
+}
+
+variable "usage_plan_product_code" {
+  type        = string
+  default     = null
+  description = "AWS Marketplace product code associated with the usage plan."
+}
+
+variable "usage_plan_quota_settings" {
+  type        = any
+  default     = {}
+  description = "Quota settings for the REST API usage plan (`limit`, `offset`, `period`)."
+}
+
+variable "usage_plan_throttle_settings" {
+  type        = any
+  default     = {}
+  description = "Throttling settings for the REST API usage plan (`burst_limit`, `rate_limit`)."
+}
+
+variable "api_keys" {
+  type        = map(any)
+  default     = {}
+  description = "Map of REST API keys to create and optionally associate with the usage plan."
+}
+
+variable "waf_acl_arn" {
+  type        = string
+  default     = ""
+  description = "ARN of an AWS WAFv2 Web ACL to associate with the REST API stage."
 }

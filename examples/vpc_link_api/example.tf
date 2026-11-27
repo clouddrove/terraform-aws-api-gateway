@@ -2,7 +2,7 @@
 ## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
 ####----------------------------------------------------------------------------------
 provider "aws" {
-  region = "eu-west-1"
+  region = "ca-central-1"
 }
 
 locals {
@@ -33,7 +33,7 @@ module "public_subnets" {
 
   name               = local.name
   environment        = local.environment
-  availability_zones = ["eu-west-1b", "eu-west-1c"]
+  availability_zones = ["ca-central-1a", "ca-central-1b"]
   vpc_id             = module.vpc.vpc_id
   cidr_block         = module.vpc.vpc_cidr_block
   type               = "public"

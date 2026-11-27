@@ -63,3 +63,33 @@ output "rest_api_stage_name" {
   value       = join("", aws_api_gateway_stage.rest_api_stage[*].stage_name)
   description = "Name of the REST API stage."
 }
+
+output "rest_api_stage_arn" {
+  value       = join("", aws_api_gateway_stage.rest_api_stage[*].arn)
+  description = "ARN of the REST API stage."
+}
+
+output "http_api_stage_id" {
+  value       = join("", aws_apigatewayv2_stage.default[*].id)
+  description = "ID of the HTTP/WebSocket API stage."
+}
+
+output "http_api_stage_arn" {
+  value       = join("", aws_apigatewayv2_stage.default[*].arn)
+  description = "ARN of the HTTP/WebSocket API stage."
+}
+
+output "vpc_links" {
+  value       = { for k, v in aws_apigatewayv2_vpc_link.default : k => v.id }
+  description = "Map of HTTP/WebSocket API VPC link IDs."
+}
+
+output "usage_plan_id" {
+  value       = join("", aws_api_gateway_usage_plan.default[*].id)
+  description = "ID of the REST API usage plan, when created."
+}
+
+output "api_key_ids" {
+  value       = { for k, v in aws_api_gateway_api_key.default : k => v.id }
+  description = "Map of REST API key IDs."
+}

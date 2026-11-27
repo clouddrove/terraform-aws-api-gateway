@@ -12,7 +12,7 @@ provider "aws" {
 locals {
   name           = "api"
   environment    = "test"
-  region         = "us-east-1"
+  region         = "ca-central-1"
   domain_name    = "clouddrove.ca"
   hosted_zone_id = "Z015XXXXXXXXXXXXXXIEP"
 }
@@ -103,7 +103,7 @@ module "subnets" {
 
   nat_gateway_enabled = true
   single_nat_gateway  = true
-  availability_zones  = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  availability_zones  = ["${local.region}a", "${local.region}b", "${local.region}d"]
   vpc_id              = module.vpc.vpc_id
   type                = "public-private"
   igw_id              = module.vpc.igw_id

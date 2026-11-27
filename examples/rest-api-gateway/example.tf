@@ -12,7 +12,7 @@ provider "aws" {
 locals {
   name           = "api"
   environment    = "test"
-  region         = "us-east-1"
+  region         = "ca-central-1"
   domain_name    = "clouddrove.ca"
   hosted_zone_id = "Z015XXXXXXXXXXXXXXIEP"
 }
