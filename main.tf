@@ -633,7 +633,7 @@ module "kms_key" {
   name                = module.labels.id
   enable_key_rotation = var.enable_key_rotation
   multi_region        = var.multi_region
-  policy              = data.aws_iam_policy_document.cloudwatch[0].json
+  policy              = join("", data.aws_iam_policy_document.cloudwatch[*].json)
 }
 
 
